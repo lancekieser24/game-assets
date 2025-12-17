@@ -1,0 +1,47 @@
+Main Important Info- 
+Tactical Actions Guide:
+1. Suppress: Prevents opponent reposition. Interacts with big 3 with 50/50 chance of +1 bonus to you or the enemy.
+2. Reposition: Roll to attempt to change combat range. Reposition auto fails with suppression. Cover is rerolled upon reposition success.
+3. Hunker Down: Only way to counter suppress. Automatically repositions 1 range closer under suppression and action selection resets. Cover -1 or +1 against flank and fortify, but no effect for overwatch.
+3. Retreat: Roll to retreat
+Big 3: no impact on reposition, but big 3 action succeeds if reposition fails.
+4. Flank: Beats fortify +1 combat roll, + (opponent cover reduced to none)
+5. Overwatch: Beats flank +1 combat roll, no additional flank bonus. However, (+2 bonus if reposition fails)
+6. Fortify: Beats Overwatch +1 combat roll, + (+1 cover quality)
+
+x symbol= ineffective at that range and no attachment can help with the exception of the masterkey and underbarrel grenade launcher.
+Max 6 rating with attachments for Rifles, max 7 for Snipers, and max 8 for SMGs/shotgun.
+
+Rock-paper-scissors gameplay interactions
+Fortify>Overwatch>Flank>Fortify
+
+You can only equip 1 specialty at a time.
+
+
+
+Other Crap if you want to know:
+
+Everything is decided by a random dice roll. Enemy ai decisions are 50% random, and 50% optimal/informed. You have to survive 4 engagements to win. 
+Dice rolls decide what weapons/attachments you and the enemy start with, current cover status, intel status, and current engagement range from R1 through R6.
+
+There are main phases:
+Intel Roll: Automatically decides if you or the enemy gets information about the other's loadout. Also generates all engagement settings. No input required.
+Choose Tactical Action: Select 1 of 6 choices, and the enemy will have already selected his tactical action via dice roll with decision matrix.
+Tactical Resolution: Summary of how your actions is provided and all player vs enemy actions are resolved. 
+Combat Phase: Combat is decided with a D8 dice roll, and higher score wins. Score= Combat roll + Range Rating + Cover Rating + Tactical Bonus.
+Tactical Resupply: Choose any 2 items to loot. You have 2 weapon slots and 6 attachments slots per weapon. These can be attachments can be changed any time by dragging the attachment from one gun to another, or into the extra attachments box. You will never lose an attachment in this phase, but the weapon will replace the current weapon in the slot you decide.
+
+Miscellaneous info:
+Al weapons have base range stats that add up to 8. There are 20 weapons with effective ranges that are largely consistent with real world counterparts, and 39 attachments.
+Combat log has some extra behind the scene information like what the decision dice roll was for the enemy ai: 1-5 are always the same base decisions, and 6-8 are the best decisions.
+Gear has active, passive or both abilities. The enemy can not use gear, only the player. Don't leave gear on the ground if you want to use it.
+
+Gear Carry Amount:
+1. Pack Slot: Holds 1L, 1V, 2M, or 3S
+2. Vest Slot: Holds 1V, 1M, or 2S
+3. Harness Slot: Holds 1W(If occupied it will display in weapon slot 2), 2M, or 2S
+4. Belt Slot: Holds 3S
+5. Primary Slot: Holds 1W
+6. Pouch Slot: Just a place to drop items to sell, and holds coins for purchase
+
+All items are worth 1 coin no matter the size or item. Black market has randomized prices 2-6 coins, and 6-8 for suppressor. Top 2 options are always suppressor and a level II Plate.
