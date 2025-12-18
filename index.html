@@ -2581,7 +2581,7 @@
                                 <h3>🎒 Gear Up!</h3>
                                 <p style="font-size: 0.8em; margin: 15px 0;">Take what you can carry and leave the rest on the ground</p>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-                                    <button class="action-btn" onclick="showBlackMarket()" style="width: 100%;">
+                                    <button class="action-btn" id="blackMarketBtn" onclick="showBlackMarket()" style="width: 100%;">
                                         <img src="Black_Market.png" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">Black Market
                                     </button>
                                     <button class="action-btn" onclick="continueFromGearUp()" style="width: 100%;">➡️ Continue</button>
@@ -5124,7 +5124,7 @@
                     }
                     enemyBonus += penalty;
                     log(`Concussion Grenade: Enemy ${penalty} to combat roll!`, 'success');
-                    resolutionMessages.push(`Concussion Grenade: Enemy ${penalty} to combat roll!`);
+                    if (resolutionMessages) resolutionMessages.push(`Concussion Grenade: Enemy ${penalty} to combat roll!`);
                 } else if ([115, 116].includes(gearId)) { // Flashbang
                     let penalty = -1;
                     // Check for Grenadier Qualification (153)
@@ -5134,29 +5134,31 @@
                     }
                     enemyBonus += penalty;
                     log(`Flashbang: Enemy ${penalty} and cannot reposition!`, 'success');
-                    resolutionMessages.push(`Flashbang: Enemy ${penalty} and cannot reposition!`);
-                    if (gameState.enemyAction === 'REPOSITION') {
-                        resolutionMessages.push('Enemy reposition suppressed by flashbang!');
+                    if (resolutionMessages) {
+                        resolutionMessages.push(`Flashbang: Enemy ${penalty} and cannot reposition!`);
+                        if (gameState.enemyAction === 'REPOSITION') {
+                            resolutionMessages.push('Enemy reposition suppressed by flashbang!');
+                        }
                     }
                 } else if (gearId === 117) { // Claymore
                     if (gameState.enemyAction === 'FLANK') {
                         log('Claymore triggered! Enemy combat score set to -1!', 'success');
-                        resolutionMessages.push('Claymore triggered! Enemy combat score set to -1!');
+                        if (resolutionMessages) resolutionMessages.push('Claymore triggered! Enemy combat score set to -1!');
                         enemyBonus = -999; // Force very low score
                     } else {
                         log('Claymore placed but not triggered', 'info');
-                        resolutionMessages.push('Claymore had no effect - enemy did not flank');
+                        if (resolutionMessages) resolutionMessages.push('Claymore had no effect - enemy did not flank');
                     }
                 } else if (gearId === 118) { // Deployable Cover
                     gameState.playerCover = 2;
                     playerBonus += 1;
                     log('Deployable Cover: Heavy cover + bonus!', 'success');
-                    resolutionMessages.push('Deployable Cover: Heavy cover + bonus!');
+                    if (resolutionMessages) resolutionMessages.push('Deployable Cover: Heavy cover + bonus!');
                     updateUI();
                 } else if (gearId === 121) { // Rocket Launcher
                     gameState.enemyCover = 0;
                     log('Rocket Launcher: Enemy cover destroyed!', 'success');
-                    resolutionMessages.push('Rocket Launcher: Enemy cover destroyed!');
+                    if (resolutionMessages) resolutionMessages.push('Rocket Launcher: Enemy cover destroyed!');
                     updateUI();
                 }
                 
@@ -6552,6 +6554,26 @@
             
             document.getElementById('tacticalActionsPanel').classList.add('hidden');
             document.getElementById('gearUpPanel').classList.remove('hidden');
+            
+            // Check if Backroom Deals are available
+            const currentEngagement = gameState.totalEngagements + gameState.engagementNum;
+            const hasBackroomDeals = Object.values(gameState.gearSlots).flat().some(item => item.type === 'gear' && item.id === 156);
+            const isBackroomEngagement = [3, 7, 11].includes(currentEngagement);
+            
+            // Make Black Market button gold if Backroom Deals are available
+            const blackMarketBtn = document.getElementById('blackMarketBtn');
+            if (hasBackroomDeals && isBackroomEngagement) {
+                blackMarketBtn.style.background = 'linear-gradient(135deg, #ffd700, #ffaa00)';
+                blackMarketBtn.style.borderColor = '#ffd700';
+                blackMarketBtn.style.color = '#000';
+                blackMarketBtn.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.6)';
+            } else {
+                blackMarketBtn.style.background = '';
+                blackMarketBtn.style.borderColor = '';
+                blackMarketBtn.style.color = '';
+                blackMarketBtn.style.boxShadow = '';
+            }
+            
             updateUI();
         }
 
@@ -6562,11 +6584,6 @@
             // Check for Black Market Contact (50% discount)
             const hasBlackMarketContact = Object.values(gameState.gearSlots).flat().some(item => item.type === 'gear' && item.id === 143);
             
-            // Check for Backroom Deals (156) - engagements 3, 7, 11
-            const currentEngagement = gameState.totalEngagements + gameState.engagementNum - 1;
-            const hasBackroomDeals = Object.values(gameState.gearSlots).flat().some(item => item.type === 'gear' && item.id === 156);
-            const isBackroomEngagement = [3, 7, 11].includes(currentEngagement);
-            
             const applyCostReduction = (baseCost) => {
                 let cost = baseCost;
                 if (hasBlackMarketContact) {
@@ -6576,28 +6593,7 @@
                 return cost;
             };
             
-            // Add Backroom Deals special plates first if applicable
-            if (hasBackroomDeals && isBackroomEngagement) {
-                log('Backroom Deals: Special Level III plate cache available!', 'success');
-                gameState.blackMarketInventory.push({
-                    type: 'gear',
-                    id: 108, // Level III Ceramic Plates
-                    cost: 1,
-                    name: 'Level III Ceramic Plates'
-                });
-                gameState.blackMarketInventory.push({
-                    type: 'gear',
-                    id: 105, // Level III Steel Plates
-                    cost: 1,
-                    name: 'Level III Steel Plates'
-                });
-                gameState.blackMarketInventory.push({
-                    type: 'gear',
-                    id: 111, // Level III PE Plates
-                    cost: 1,
-                    name: 'Level III PE Plates'
-                });
-            }
+            // Note: Backroom Deals check moved to showBlackMarket() so it updates dynamically
             
             // 1. Suppressor: 6-8 coins
             gameState.blackMarketInventory.push({
@@ -6693,6 +6689,47 @@
         }
         
         function showBlackMarket() {
+            playButtonClick();
+            
+            // Check for Backroom Deals RIGHT NOW when opening black market
+            const currentEngagement = gameState.totalEngagements + gameState.engagementNum;
+            const hasBackroomDeals = Object.values(gameState.gearSlots).flat().some(item => item.type === 'gear' && item.id === 156);
+            const isBackroomEngagement = [3, 7, 11].includes(currentEngagement);
+            
+            // If Backroom Deals is available and inventory doesn't have the special plates, add them now
+            if (hasBackroomDeals && isBackroomEngagement) {
+                // Check if we already added the backroom deals items
+                const hasBackroomItems = gameState.blackMarketInventory.some(item => 
+                    item.type === 'gear' && [108, 105, 111].includes(item.id) && item.cost === 1
+                );
+                
+                if (!hasBackroomItems) {
+                    log('Backroom Deals: Special Level III plate cache available!', 'success');
+                    // Add at the beginning of the inventory
+                    gameState.blackMarketInventory.unshift({
+                        type: 'gear',
+                        id: 108, // Level III Ceramic Plates
+                        cost: 1,
+                        name: 'Level III Ceramic Plates',
+                        backroomDeal: true
+                    });
+                    gameState.blackMarketInventory.unshift({
+                        type: 'gear',
+                        id: 105, // Level III Steel Plates
+                        cost: 1,
+                        name: 'Level III Steel Plates',
+                        backroomDeal: true
+                    });
+                    gameState.blackMarketInventory.unshift({
+                        type: 'gear',
+                        id: 111, // Level III PE Plates
+                        cost: 1,
+                        name: 'Level III PE Plates',
+                        backroomDeal: true
+                    });
+                }
+            }
+            
             const modal = document.getElementById('resupplyModal');
             const content = document.getElementById('resupplyContent');
             
@@ -6717,7 +6754,13 @@
                 if (purchased) itemClass += ' purchased';
                 else if (!canAfford) itemClass += ' cannot-afford';
                 
-                html += `<div class="${itemClass}" onclick="purchaseBlackMarketItem(${idx})">`;
+                // Highlight Backroom Deals items in gold
+                let itemStyle = '';
+                if (item.backroomDeal && !purchased) {
+                    itemStyle = 'border-color: #ffd700; background: rgba(255, 215, 0, 0.2);';
+                }
+                
+                html += `<div class="${itemClass}" onclick="purchaseBlackMarketItem(${idx})" style="${itemStyle}">`;
                 
                 // Item icon
                 let iconSrc = '';
@@ -6733,6 +6776,9 @@
                 // Item details
                 html += '<div style="flex: 1;">';
                 html += `<strong>${item.name}</strong>`;
+                if (item.backroomDeal) {
+                    html += ` <span style="color: #ffd700; font-weight: bold;">⭐ BACKROOM DEAL</span>`;
+                }
                 if (item.type === 'attachment') {
                     html += `<br><span style="color: #aaa; font-size: 0.9em;">${ATTACHMENTS[item.id].group}: ${formatAttachmentRatings(item.id)}</span>`;
                 } else if (item.type === 'gear') {
@@ -8606,20 +8652,23 @@
             gameState.utilizedGear = item;
             
             // Handle gear with multiple uses (don't remove immediately)
-            if ([123, 127, 162].includes(gearId)) {
+            if ([123, 127, 158, 162].includes(gearId)) {
                 if (!item.currentUses) {
                     item.currentUses = gear.uses;
                 }
-                item.currentUses--;
-                log(`${gear.name} used (${item.currentUses} uses remaining)`, 'info');
-                
-                // Only remove if no uses left
-                if (item.currentUses <= 0) {
-                    gameState.gearSlots[slotName].splice(idx, 1);
-                    log(`${gear.name} depleted`, 'info');
+                // Don't decrement uses here for Combat Medic Bag - it will be handled in the menu functions
+                if (gearId !== 158) {
+                    item.currentUses--;
+                    log(`${gear.name} used (${item.currentUses} uses remaining)`, 'info');
+                    
+                    // Only remove if no uses left
+                    if (item.currentUses <= 0) {
+                        gameState.gearSlots[slotName].splice(idx, 1);
+                        log(`${gear.name} depleted`, 'info');
+                    }
                 }
-            } else if (gearId !== 161) {
-                // Remove single-use gear from slot after use (except Grappling Hook which we'll handle specially)
+            } else if (gearId !== 161 && gearId !== 158) {
+                // Remove single-use gear from slot after use (except Grappling Hook and Combat Medic Bag which we'll handle specially)
                 gameState.gearSlots[slotName].splice(idx, 1);
             }
             
@@ -8628,6 +8677,25 @@
                 log('Grappling Hook activated! Choose adjacent range...', 'success');
                 showGrapplingHookMenu();
                 return;
+            } else if ([115, 116].includes(gearId)) { // Flashbang Grenade
+                log('Flashbang deployed! Enemy disoriented and cannot reposition!', 'success');
+                showGearResultPanel('Flashbang Grenade', 'Tossed concussion grenade to disorient the enemy preventing any repositioning. The enemy also gets -1 combat score.');
+            } else if (gearId === 117) { // Claymore
+                log('Claymore placed!', 'success');
+                showGearResultPanel('Claymore', 'Claymore set. If the enemy flanks, they are in for a nasty surprise.');
+            } else if (gearId === 118) { // Deployable Cover - FIXED
+                gameState.playerCover = 2;
+                log('Deployable Cover: Heavy cover + bonus!', 'success');
+                updateUI();
+                showGearResultPanel('Deployable Cover', 'Effective deployment for deploying deployable cover for superior deployable defense.');
+            } else if ([119, 120].includes(gearId)) { // Concussion Grenade
+                log('Concussion Grenade deployed!', 'success');
+                showGearResultPanel('Concussion Grenade', 'Tossed concussion grenade to disorient enemy. The enemy gets -1 combat score.');
+            } else if (gearId === 121) { // Disposable Rocket Launcher
+                gameState.enemyCover = 0;
+                log('Rocket Launcher: Enemy cover destroyed!', 'success');
+                updateUI();
+                showGearResultPanel('Disposable Rocket Launcher', 'Ca-booom. Enemy cover eliminated!');
             } else if ([100, 101].includes(gearId)) { // Recon Drone or Thermal Binoculars
                 log(`${gear.name} activated! Revealing enemy action...`, 'success');
                 log(`Enemy will ${gameState.enemyAction}`, 'danger');
@@ -8663,7 +8731,7 @@
                 } else {
                     log('🎯 DIRECT HIT! Enemy eliminated!', 'success');
                     gameState.combatScores.push(10);
-                    showResupplyModal();
+                    showGearKillPanel('Mortar Strike', '🎯 DIRECT HIT! Enemy eliminated!');
                     return;
                 }
             } else if (gearId === 123) { // Laser Designator
@@ -8674,6 +8742,11 @@
                     gameState.laserDesignatorPenalty = -1;
                     log('Exposed too long! -1 to your combat roll.', 'danger');
                     showGearResultPanel('Laser Designator', 'Exposed position! -1 to your combat roll this engagement.');
+                } else if (roll === 6) {
+                    log('🎯 Laser strike! Enemy eliminated!', 'success');
+                    gameState.combatScores.push(10);
+                    showGearKillPanel('Laser Designator', '🎯 Laser strike! Enemy eliminated!');
+                    return;
                 } else {
                     gameState.enemyCover = Math.max(0, gameState.enemyCover - 1);
                     log('Enemy cover reduced by -1!', 'success');
@@ -8698,7 +8771,7 @@
                 } else {
                     log('🎯 Artillery eliminated the enemy!', 'success');
                     gameState.combatScores.push(10);
-                    showResupplyModal();
+                    showGearKillPanel('Artillery Strike', '🎯 Artillery eliminated the enemy!');
                     return;
                 }
             } else if (gearId === 125) { // Call Airstrike
@@ -8712,7 +8785,7 @@
                     if (roll <= (currentRange + 1)) {
                         log('✈️ Airstrike successful! Enemy eliminated!', 'success');
                         gameState.combatScores.push(10);
-                        showResupplyModal();
+                        showGearKillPanel('Airstrike', '✈️ Airstrike successful! Enemy eliminated!');
                         return;
                     } else {
                         if (gameState.gearEffects.spallingInjury) {
@@ -8726,13 +8799,13 @@
                         log('Enemy still eliminated by airstrike.', 'success');
                         updateMobilityButtons();
                         gameState.combatScores.push(10);
-                        showResupplyModal();
+                        showGearKillPanel('Airstrike', '✈️ Airstrike successful! Enemy eliminated!<br><br>⚠️ Danger Close! You took shrapnel impacting your movement.');
                         return;
                     }
                 } else {
                     log('✈️ Airstrike at R6 - Safe distance! Enemy eliminated!', 'success');
                     gameState.combatScores.push(10);
-                    showResupplyModal();
+                    showGearKillPanel('Airstrike', '✈️ Airstrike at R6 - Safe distance! Enemy eliminated!');
                     return;
                 }
             } else if ([126, 132].includes(gearId)) { // Med Kit
@@ -8740,6 +8813,9 @@
                 log('Med Kit used! Movement restored.', 'success');
                 updateMobilityButtons();
                 showGearResultPanel('Med Kit', 'Injuries healed - full mobility restored!');
+            } else if (gearId === 158) { // Combat Medic Bag
+                showCombatMedicMenu();
+                return;
             } else if (gearId === 162) { // Sandbags
                 if (!item.currentUses) {
                     item.currentUses = gear.uses;
@@ -8794,7 +8870,7 @@
                 if (roll === 6) {
                     log('🎯 DIRECT HIT! Enemy eliminated!', 'success');
                     gameState.combatScores.push(10);
-                    showResupplyModal();
+                    showGearKillPanel('Frag Grenade', '🎯 DIRECT HIT! Enemy eliminated!');
                     return;
                 } else if (roll >= 3) {
                     gameState.enemyCover = 0;
@@ -8828,38 +8904,79 @@
             html += '<h3>💉 Combat Medic Bag</h3>';
             html += '<p style="margin: 15px 0;">Choose how to use:</p>';
             html += '<div class="actions-grid">';
-            html += '<button class="action-btn" onclick="useCombatMedicHeal()">Heal Injury (1 use)</button>';
-            html += '<button class="action-btn" onclick="useCombatMedicFullRestore()">Remove Last Stand + Heal (2 uses)</button>';
-            html += '<button class="action-btn" onclick="cancelUtilizeGear()" style="background: #666; border-color: #888;">Cancel</button>';
+            
+            // Find Combat Medic Bag to check uses
+            const combatMedicItem = Object.values(gameState.gearSlots).flat().find(item => item.type === 'gear' && item.id === 158);
+            const currentUses = combatMedicItem ? (combatMedicItem.currentUses || 2) : 2;
+            
+            // Heal Injury button - disabled if only 1 use left
+            if (currentUses <= 1) {
+                html += '<button class="action-btn" onclick="useCombatMedicHeal()" style="opacity: 0.5; cursor: not-allowed;" disabled>Heal Injury (1 use) - Need 2 uses</button>';
+            } else {
+                html += '<button class="action-btn" onclick="useCombatMedicHeal()">Heal Injury (1 use)</button>';
+            }
+            
+            // Only show full restore option if Last Stand is active and has 2 uses
+            if (gameState.lastStandActive && currentUses >= 2) {
+                html += '<button class="action-btn" onclick="useCombatMedicFullRestore()">Remove Last Stand + Heal (2 uses)</button>';
+            }
+            
+            html += '<button class="action-btn" onclick="cancelCombatMedic()" style="background: #666; border-color: #888;">Cancel</button>';
             html += '</div>';
             html += '</div>';
             panel.innerHTML = html;
         }
         
+        function cancelCombatMedic() {
+            playButtonClick();
+            resetTacticalActionsPanel();
+            updateMobilityButtons();
+            gameState.waitingForAction = true;
+        }
+        
         function useCombatMedicHeal() {
+            playButtonClick();
             // Find Combat Medic Bag in slots
             for (let slotName in gameState.gearSlots) {
                 const idx = gameState.gearSlots[slotName].findIndex(item => item.type === 'gear' && item.id === 158);
                 if (idx !== -1) {
                     const item = gameState.gearSlots[slotName][idx];
                     if (!item.currentUses) item.currentUses = 2;
+                    
+                    // Use 1 charge
                     item.currentUses--;
                     
+                    // Heal any injuries
                     gameState.gearEffects.spallingInjury = false;
-                    log('Combat Medic Bag: Injury healed! (1 use remaining)', 'success');
+                    gameState.gearEffects.mobilityImpaired = false;
                     
-                    if (item.currentUses <= 0) {
-                        gameState.gearSlots[slotName].splice(idx, 1);
-                    }
+                    log(`Combat Medic Bag: Injury healed! Converting to Med Kit...`, 'success');
+                    
+                    // Remove Combat Medic Bag and replace with Med Kit (ID 126 or 132)
+                    gameState.gearSlots[slotName].splice(idx, 1);
+                    gameState.gearSlots[slotName].push({ type: 'gear', id: 126, data: GEAR[126] });
+                    
+                    log('Combat Medic Bag converted to Med Kit (1 use remaining)', 'info');
                     
                     updateMobilityButtons();
-                    showGearResultPanel('Combat Medic Bag', 'Injury healed! Full mobility restored.');
+                    updateUI();
+                    
+                    // Show result and return to actions
+                    const panel = document.getElementById('tacticalActionsPanel');
+                    let html = '<div class="combat-summary">';
+                    html += '<h3>💉 Combat Medic Bag</h3>';
+                    html += '<p style="font-size: 1.2em; color: #00ff88; margin: 20px 0;">Injury healed! Full mobility restored.</p>';
+                    html += '<p style="font-size: 1em; color: #fff; margin: 10px 0;">Combat Medic Bag converted to Med Kit (Size: S) - 1 use remaining.</p>';
+                    html += '<button class="action-btn" onclick="returnToActions()" style="width: 100%;">➡️ Continue</button>';
+                    html += '</div>';
+                    panel.innerHTML = html;
                     return;
                 }
             }
         }
         
         function useCombatMedicFullRestore() {
+            playButtonClick();
             // Find Combat Medic Bag in slots
             for (let slotName in gameState.gearSlots) {
                 const idx = gameState.gearSlots[slotName].findIndex(item => item.type === 'gear' && item.id === 158);
@@ -8873,15 +8990,28 @@
                         return;
                     }
                     
+                    // Heal all injuries and remove Last Stand
                     gameState.gearEffects.spallingInjury = false;
+                    gameState.gearEffects.mobilityImpaired = false;
                     gameState.lastStandActive = false;
+                    
                     log('Combat Medic Bag: Last Stand effect removed! Full recovery!', 'success');
                     
-                    // Remove the item entirely
+                    // Remove the item entirely (both uses consumed)
                     gameState.gearSlots[slotName].splice(idx, 1);
                     
                     updateMobilityButtons();
-                    showGearResultPanel('Combat Medic Bag', 'Last Stand effect removed! Full recovery achieved.');
+                    updateUI();
+                    
+                    // Show result and return to actions
+                    const panel = document.getElementById('tacticalActionsPanel');
+                    let html = '<div class="combat-summary">';
+                    html += '<h3>💉 Combat Medic Bag</h3>';
+                    html += '<p style="font-size: 1.2em; color: #00ff88; margin: 20px 0;">Last Stand effect removed! Full recovery achieved.</p>';
+                    html += '<p style="font-size: 1em; color: #fff; margin: 10px 0;">All injuries healed. Combat Medic Bag fully depleted.</p>';
+                    html += '<button class="action-btn" onclick="returnToActions()" style="width: 100%;">➡️ Continue</button>';
+                    html += '</div>';
+                    panel.innerHTML = html;
                     return;
                 }
             }
@@ -8970,9 +9100,27 @@
             panel.innerHTML = html;
         }
 
+        
+        function showGearKillPanel(title, message) {
+            const panel = document.getElementById('tacticalActionsPanel');
+            let html = '<div class="combat-summary">';
+            html += `<h3>${title}</h3>`;
+            html += `<p style="font-size: 1.2em; color: #fff; margin: 20px 0;">${message}</p>`;
+            html += '<button class="action-btn" onclick="continueToResupply()" style="width: 100%;">➡️ Continue</button>';
+            html += '</div>';
+            panel.innerHTML = html;
+        }
+        
+        function continueToResupply() {
+            playButtonClick();
+            showResupplyModal();
+        }
+
         function returnToActions() {
+            playButtonClick();
             resetTacticalActionsPanel();
             updateMobilityButtons(); // Re-check mobility restrictions after utilizing gear
+            updateUI(); // Make sure UI reflects any changes
             gameState.waitingForAction = true;
         }
 
