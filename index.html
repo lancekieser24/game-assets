@@ -2791,7 +2791,7 @@
             114: { name: "Smoke Grenade", size: "S", icon: "Tac_Grenade.png", description: "Active: 1 use. Deploy smoke to cover movement. Guarantees a successful Retreat or reposition.", passive: false, active: true },
             115: { name: "Flashbang Grenade", size: "S", icon: "Tac_Grenade.png", description: "Active: 1 use. Disorient the enemy. Enemy suffers -1 to their combat roll this round and cannot successfully reposition.", passive: false, active: true },
             116: { name: "Flashbang Grenade", size: "S", icon: "Tac_Grenade.png", description: "Active: 1 use. Disorient the enemy. Enemy suffers -1 to their combat roll this round and cannot successfully reposition.", passive: false, active: true },
-            117: { name: "Claymore", size: "M", icon: "Claymore.png", description: "Active: 1 use. Place Claymore down near position to set a trap for the enemy.", passive: false, active: true },
+            117: { name: "Claymore", size: "M", icon: "Claymore.png", description: "Active: 2 uses. Place Claymore down near position to set a trap. If enemy flanks this round, they are eliminated.", passive: false, active: true, uses: 2 },
             118: { name: "Deployable Cover", size: "M", icon: "Deployable_Cover.png", description: "Active: 1 use. Provides superior cover, even more than heavy cover.", passive: false, active: true },
             119: { name: "Concussion Grenade", size: "S", icon: "Tac_Grenade.png", description: "Active: 1 use. Disorient the enemy. Enemy suffers -1 to their combat roll this round.", passive: false, active: true },
             120: { name: "Concussion Grenade", size: "S", icon: "Tac_Grenade.png", description: "Active: 1 use. Disorient the enemy. Enemy suffers -1 to their combat roll this round.", passive: false, active: true },
@@ -3149,6 +3149,7 @@
             enemyName: null,
             intelResult: 0,
             enemyAction: null,
+            claymoreActive: false,
             gameOver: false,
             victory: false,
             waitingForAction: false,
@@ -4644,6 +4645,24 @@
         // Resolve Tactical Interaction
         function resolveTacticalInteraction(playerAction, resolutionMessages) {
             const enemy = gameState.enemyAction;
+            
+            // Check if Claymore is active and enemy is flanking
+            if (gameState.claymoreActive && enemy === 'FLANK') {
+                log('🎯 Claymore triggered! Enemy eliminated!', 'success');
+                gameState.combatScores.push(10);
+                
+                // Clear claymore active flag
+                gameState.claymoreActive = false;
+                
+                // Show kill panel and proceed to resupply
+                updateUI();
+                document.getElementById('tacticalActionsPanel').classList.add('hidden');
+                showGearKillPanel('Claymore', '💣 Claymore Triggered! Enemy eliminated!');
+                return;
+            }
+            
+            // Clear claymore active flag at the start of resolution (it only lasts one round)
+            gameState.claymoreActive = false;
             
             const interactions = {
                 // SUPPRESS interactions
@@ -8651,6 +8670,45 @@
             
             gameState.utilizedGear = item;
             
+            // Handle Claymore immediately if enemy is flanking
+            if (gearId === 117) { // Claymore
+                // Handle gear with multiple uses (don't remove immediately)
+                if (!item.currentUses) {
+                    item.currentUses = gear.uses;
+                }
+                
+                // Always decrement uses when utilized
+                item.currentUses--;
+                const usesRemaining = item.currentUses;
+                log(`Claymore used (${usesRemaining} use${usesRemaining !== 1 ? 's' : ''} remaining)`, 'info');
+                
+                // Remove if no uses left
+                if (item.currentUses <= 0) {
+                    gameState.gearSlots[slotName].splice(idx, 1);
+                    log('Claymore depleted', 'info');
+                }
+                
+                if (gameState.enemyAction === 'FLANK') {
+                    // Enemy is flanking - instant kill!
+                    log('🎯 Claymore triggered! Enemy eliminated!', 'success');
+                    gameState.combatScores.push(10);
+                    
+                    gameState.utilizedGear = null;
+                    
+                    updateUI();
+                    showGearKillPanel('Claymore', '💣 Claymore Triggered! Enemy eliminated!');
+                    return;
+                } else {
+                    // Enemy is not flanking - show placement message but mark claymore as active for this round only
+                    gameState.claymoreActive = true;
+                    log('Claymore placed!', 'success');
+                    
+                    const usesText = usesRemaining > 0 ? `${usesRemaining} use${usesRemaining !== 1 ? 's' : ''} remaining` : 'No uses remaining';
+                    showGearResultPanel('Claymore', `Claymore set. If the enemy flanks this round, they are in for a nasty surprise. (${usesText})`);
+                    return;
+                }
+            }
+            
             // Handle gear with multiple uses (don't remove immediately)
             if ([123, 127, 158, 162].includes(gearId)) {
                 if (!item.currentUses) {
@@ -8691,7 +8749,7 @@
             } else if ([119, 120].includes(gearId)) { // Concussion Grenade
                 log('Concussion Grenade deployed!', 'success');
                 showGearResultPanel('Concussion Grenade', 'Tossed concussion grenade to disorient enemy. The enemy gets -1 combat score.');
-            } else if (gearId === 121) { // Disposable Rocket Launcher
+            } else if (gearId === 118) { // Deployable Cover - FIXED
                 gameState.enemyCover = 0;
                 log('Rocket Launcher: Enemy cover destroyed!', 'success');
                 updateUI();
