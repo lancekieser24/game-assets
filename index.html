@@ -2613,7 +2613,8 @@
                 Each engagement will test your tactical decision-making.<br>
                 Manage your gear wisely. Victory requires completing all 4 engagements.
             </p>
-            <div id="difficultyButtons" style="display: flex; gap: 20px; justify-content: center;">
+            <div id="difficultyButtons" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <button class="start-btn" onclick="showGameInfo()" style="background: linear-gradient(135deg, #00d4ff, #0088cc);">GAME INFO</button>
                 <button class="start-btn" onclick="startGame(1)" style="background: linear-gradient(135deg, #0f3460, #16213e);">BEGIN MISSION<br>NORMAL</button>
                 <button class="start-btn" onclick="startGame(2)" style="background: linear-gradient(135deg, #e94560, #8b2635);">BEGIN MISSION<br>ARMORED</button>
             </div>
@@ -2826,6 +2827,64 @@
     <div id="historyModal" class="modal">
         <div class="modal-content">
             <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <!-- Game Info Modal -->
+    <div id="gameInfoModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <h2>📖 Game Information</h2>
+            
+            <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                <h3 style="color: #e94560; margin-top: 20px;">Main Important Info/Rules</h3>
+                
+                <h4 style="color: #00d4ff; margin-top: 15px;">Tactical Actions Guide:</h4>
+                <ol style="line-height: 1.8; margin-left: 20px;">
+                    <li><strong>Suppress:</strong> Prevents opponent reposition. Interacts with big 3 with 50/50 chance of +1 bonus to you or the enemy.</li>
+                    <li><strong>Reposition:</strong> Roll to attempt to change combat range. Reposition auto fails with suppression. Cover is rerolled upon reposition success.</li>
+                    <li><strong>Hunker Down:</strong> Only way to counter suppress. Automatically repositions 1 range closer under suppression and action selection resets. Cover -1 or +1 against flank and fortify, but no effect for overwatch.</li>
+                    <li><strong>Retreat:</strong> Roll to retreat Big 3: no impact on reposition, but big 3 action succeeds if reposition fails.</li>
+                    <li><strong>Flank:</strong> Beats fortify +1 combat roll, + (opponent cover reduced to none)</li>
+                    <li><strong>Overwatch:</strong> Beats flank +1 combat roll, no additional flank bonus. However, (+2 bonus if reposition fails)</li>
+                    <li><strong>Fortify:</strong> Beats Overwatch +1 combat roll, + (+1 cover quality)</li>
+                </ol>
+                
+                <p style="margin-top: 15px;"><strong>x symbol</strong> = ineffective at that range and no attachment can help with the exception of the masterkey and underbarrel grenade launcher. Max 6 rating with attachments for Rifles, max 7 for Snipers, and max 8 for SMGs/shotgun.</p>
+                
+                <p style="margin-top: 15px;"><strong>Rock-paper-scissors gameplay interactions:</strong> Fortify > Overwatch > Flank > Fortify</p>
+                
+                <p style="margin-top: 15px;"><strong>You can only equip 1 specialty gear at a time.</strong></p>
+                
+                <h3 style="color: #e94560; margin-top: 25px;">Other Details</h3>
+                
+                <p style="margin-top: 15px;">Everything is decided by a random dice roll. Enemy AI decisions are 50% random, and 50% optimal/informed. You have to survive 4 engagements to win. Dice rolls decide what weapons/attachments you and the enemy start with, current cover status, intel status, and current engagement range from R1 through R6.</p>
+                
+                <h4 style="color: #00d4ff; margin-top: 15px;">Main Phases:</h4>
+                <ul style="line-height: 1.8; margin-left: 20px;">
+                    <li><strong>Intel Roll:</strong> Automatically decides if you or the enemy gets information about the other's loadout. Also generates all engagement settings. No input required.</li>
+                    <li><strong>Choose Tactical Action:</strong> Select 1 of 6 choices, and the enemy will have already selected his tactical action via dice roll with decision matrix.</li>
+                    <li><strong>Tactical Resolution:</strong> Summary of how your actions is provided and all player vs enemy actions are resolved.</li>
+                    <li><strong>Combat Phase:</strong> Combat is decided with a D8 dice roll, and higher score wins. Score = Combat roll + Range Rating + Cover Rating + Tactical Bonus.</li>
+                    <li><strong>Tactical Resupply:</strong> Choose any 2 items to loot. You have 2 weapon slots and 6 attachments slots per weapon. These can be attachments can be changed any time by dragging the attachment from one gun to another, or into the extra attachments box. You will never lose an attachment in this phase, but the weapon will replace the current weapon in the slot you decide.</li>
+                </ul>
+                
+                <h4 style="color: #00d4ff; margin-top: 15px;">Miscellaneous Info:</h4>
+                <p style="margin-top: 10px;">All weapons have base range stats that add up to 8. There are 20 weapons with effective ranges that are largely consistent with real world counterparts, and 39 attachments. Combat log has some extra behind the scene information like what the decision dice roll was for the enemy AI: 1-5 are always the same base decisions, and 6-8 are the best decisions. Gear has active, passive or both abilities. The enemy can not use gear, only the player. Don't leave gear on the ground if you want to use it.</p>
+                
+                <h4 style="color: #00d4ff; margin-top: 15px;">Gear Carry Amount:</h4>
+                <ol style="line-height: 1.8; margin-left: 20px;">
+                    <li><strong>Pack Slot:</strong> Holds 1L, 1V, 2M, or 3S</li>
+                    <li><strong>Vest Slot:</strong> Holds 1V, 1M, or 2S</li>
+                    <li><strong>Harness Slot:</strong> Holds 1W (If occupied it will display in weapon slot 2), 2M, or 2S</li>
+                    <li><strong>Belt Slot:</strong> Holds 3S</li>
+                    <li><strong>Primary Slot:</strong> Holds 1W</li>
+                    <li><strong>Pouch Slot:</strong> Just a place to drop items to sell, and holds coins for purchase</li>
+                </ol>
+                
+                <p style="margin-top: 15px;">All items are worth 1 coin no matter the size or item. Black market has randomized prices 2-6 coins, and 6-8 for suppressor. Top 2 options are always suppressor and a level II Plate.</p>
+            </div>
+            
+            <button class="confirm-btn" onclick="closeGameInfo()" style="margin-top: 20px;">Close</button>
         </div>
     </div>
 
@@ -3247,6 +3306,16 @@
         function closeHistoryModal() {
             playButtonClick();
             document.getElementById('historyModal').classList.remove('active');
+        }
+
+        function showGameInfo() {
+            playButtonClick();
+            document.getElementById('gameInfoModal').classList.add('active');
+        }
+
+        function closeGameInfo() {
+            playButtonClick();
+            document.getElementById('gameInfoModal').classList.remove('active');
         }
 
         function confirmDeleteHistory() {
