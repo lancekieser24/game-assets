@@ -31,6 +31,10 @@
                 padding: 10px;
             }
 
+            .container {
+                max-width: 100%;
+            }
+
             .game-grid {
                 display: flex !important;
                 flex-direction: column !important;
@@ -38,61 +42,33 @@
             }
 
             .main-area {
-                order: 1;
-            }
-
-            .status-panel {
-                order: 2;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 15px !important;
             }
 
-            /* Reorder main-area sections for mobile */
-            #rangePanel {
-                order: 1;
+            .status-panel {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 15px !important;
+                grid-template-columns: 1fr !important;
             }
 
-            #playerLoadout {
-                order: 4;
+            /* Main area panel ordering */
+            .main-area > .panel:nth-child(1) {
+                order: 1; /* Range panel */
             }
 
-            #enemyLoadout {
-                order: 5;
+            .main-area > .panel:nth-child(2) {
+                order: 2; /* Loadout & Gear */
             }
 
-            #tacticalActionsPanel {
-                order: 6;
+            .main-area > .panel:nth-child(3) {
+                order: 5; /* Enemy Loadout */
             }
 
-            /* Gear slots section */
-            .panel:has(#gearSlots) {
-                order: 2;
-            }
-
-            /* Ground gear appears after gear slots */
-            #groundGear {
-                order: 3;
-            }
-
-            /* Combat log in status panel */
-            .panel:has(#combatLog) {
-                order: 1;
-            }
-
-            /* Mission status */
-            .panel:has(#engagementStat) {
-                order: 2;
-            }
-
-            /* Display settings */
-            .panel:has(#themeSelect) {
-                order: 3;
-            }
-
-            /* Dev tools */
-            .panel:has(#devGearBtn) {
-                order: 4;
+            .main-area > .panel:nth-child(4) {
+                order: 6; /* Tactical Actions */
             }
 
             h1 {
@@ -115,56 +91,89 @@
 
             .ratings-display {
                 flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            /* Mobile: Split ratings into 2 rows of 3 */
+            .weapon-card .ratings-display {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                grid-template-rows: auto auto !important;
+                gap: 8px !important;
+                max-width: 100% !important;
+            }
+
+            .weapon-card .ratings-display .rating-badge:nth-child(1),
+            .weapon-card .ratings-display .rating-badge:nth-child(2),
+            .weapon-card .ratings-display .rating-badge:nth-child(3) {
+                grid-row: 1;
+            }
+
+            .weapon-card .ratings-display .rating-badge:nth-child(4),
+            .weapon-card .ratings-display .rating-badge:nth-child(5),
+            .weapon-card .ratings-display .rating-badge:nth-child(6) {
+                grid-row: 2;
             }
 
             .rating-badge {
-                min-width: 80px;
-                padding: 8px 10px;
+                min-width: 70px;
+                padding: 6px 8px;
             }
 
             .rating-label {
-                font-size: 1.1em;
+                font-size: 0.9em;
             }
 
             .rating-value {
-                font-size: 1.6em;
+                font-size: 1.4em;
             }
 
             .attachment-grid {
-                grid-template-columns: 150px 300px 150px;
-                grid-template-rows: 100px 130px 100px;
-                gap: 10px;
+                grid-template-columns: 120px 240px 120px;
+                grid-template-rows: 80px 110px 80px;
+                gap: 8px;
             }
 
             .attachment-slot {
-                width: 150px;
-                height: 100px;
+                width: 120px;
+                height: 80px;
+                font-size: 0.75em;
             }
 
             .attachment-slot.half-width {
-                width: 145px;
-                height: 100px;
+                width: 116px;
+                height: 80px;
             }
 
             .attachment-slot.weapon-center {
-                width: 300px;
-                height: 130px;
+                width: 240px;
+                height: 110px;
             }
 
             .actions-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
             .loadout-gear-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
-            .gear-column {
-                order: 1;
+            .weapon-name {
+                font-size: 1.2em !important;
             }
 
-            .loadout-section {
-                order: 2;
+            .panel h2 {
+                font-size: 1.2em;
+            }
+
+            .action-btn {
+                font-size: 1em;
+                padding: 12px;
+            }
+
+            .start-btn {
+                font-size: 1.1em;
+                padding: 15px 25px;
             }
         }
 
