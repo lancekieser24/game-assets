@@ -25,158 +25,6 @@
             -ms-user-select: none;
         }
 
-        /* Mobile-specific layout */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                max-width: 100%;
-            }
-
-            .game-grid {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 15px !important;
-            }
-
-            .main-area {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 15px !important;
-            }
-
-            .status-panel {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 15px !important;
-                grid-template-columns: 1fr !important;
-            }
-
-            /* Main area panel ordering */
-            .main-area > .panel:nth-child(1) {
-                order: 1; /* Range panel */
-            }
-
-            .main-area > .panel:nth-child(2) {
-                order: 2; /* Loadout & Gear */
-            }
-
-            .main-area > .panel:nth-child(3) {
-                order: 5; /* Enemy Loadout */
-            }
-
-            .main-area > .panel:nth-child(4) {
-                order: 6; /* Tactical Actions */
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            h1 img {
-                width: 40px;
-                height: 30px;
-            }
-
-            .engagement-header {
-                font-size: 1.5em;
-                padding: 10px;
-            }
-
-            .weapon-card {
-                padding: 10px;
-            }
-
-            .ratings-display {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            /* Mobile: Split ratings into 2 rows of 3 */
-            .weapon-card .ratings-display {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important;
-                grid-template-rows: auto auto !important;
-                gap: 8px !important;
-                max-width: 100% !important;
-            }
-
-            .weapon-card .ratings-display .rating-badge:nth-child(1),
-            .weapon-card .ratings-display .rating-badge:nth-child(2),
-            .weapon-card .ratings-display .rating-badge:nth-child(3) {
-                grid-row: 1;
-            }
-
-            .weapon-card .ratings-display .rating-badge:nth-child(4),
-            .weapon-card .ratings-display .rating-badge:nth-child(5),
-            .weapon-card .ratings-display .rating-badge:nth-child(6) {
-                grid-row: 2;
-            }
-
-            .rating-badge {
-                min-width: 70px;
-                padding: 6px 8px;
-            }
-
-            .rating-label {
-                font-size: 0.9em;
-            }
-
-            .rating-value {
-                font-size: 1.4em;
-            }
-
-            .attachment-grid {
-                grid-template-columns: 120px 240px 120px;
-                grid-template-rows: 80px 110px 80px;
-                gap: 8px;
-            }
-
-            .attachment-slot {
-                width: 120px;
-                height: 80px;
-                font-size: 0.75em;
-            }
-
-            .attachment-slot.half-width {
-                width: 116px;
-                height: 80px;
-            }
-
-            .attachment-slot.weapon-center {
-                width: 240px;
-                height: 110px;
-            }
-
-            .actions-grid {
-                grid-template-columns: 1fr !important;
-            }
-
-            .loadout-gear-container {
-                grid-template-columns: 1fr !important;
-            }
-
-            .weapon-name {
-                font-size: 1.2em !important;
-            }
-
-            .panel h2 {
-                font-size: 1.2em;
-            }
-
-            .action-btn {
-                font-size: 1em;
-                padding: 12px;
-            }
-
-            .start-btn {
-                font-size: 1.1em;
-                padding: 15px 25px;
-            }
-        }
-
         /* Solid Military Theme Background */
         body.theme-military {
             background: linear-gradient(135deg, #2a3a1a 0%, #1a2410 100%) !important;
@@ -2623,9 +2471,9 @@
                 Manage your gear wisely. Victory requires completing all 4 engagements.
             </p>
             <div id="difficultyButtons" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                <button class="start-btn" onclick="showGameInfo()" style="background: linear-gradient(135deg, #00d4ff, #0088cc);">GAME INFO</button>
                 <button class="start-btn" onclick="startGame(1)" style="background: linear-gradient(135deg, #0f3460, #16213e);">BEGIN MISSION<br>NORMAL</button>
                 <button class="start-btn" onclick="startGame(2)" style="background: linear-gradient(135deg, #e94560, #8b2635);">BEGIN MISSION<br>ARMORED</button>
+                <button class="start-btn" onclick="showGameInfo()" style="background: linear-gradient(135deg, #00d4ff, #0096cc);">MORE GAME INFO</button>
             </div>
         </div>
         
@@ -2841,47 +2689,64 @@
 
     <!-- Game Info Modal -->
     <div id="gameInfoModal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <h2>📖 Game Information</h2>
+        <div class="modal-content" style="max-width: 900px;">
+            <h2 style="color: #00d4ff; margin-bottom: 20px;">📖 Game Information & Rules</h2>
             
-            <div style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
-                <h3 style="color: #e94560; margin-top: 20px;">Main Important Info/Rules</h3>
-                
-                <h4 style="color: #00d4ff; margin-top: 15px;">Tactical Actions Guide:</h4>
-                <ol style="line-height: 1.8; margin-left: 20px;">
+            <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                <h3 style="color: #e94560; margin-top: 20px;">Main Important Info/Rules - Tactical Actions Guide:</h3>
+                <ol style="line-height: 1.8; color: #fff;">
                     <li><strong>Suppress:</strong> Prevents opponent reposition. Interacts with big 3 with 50/50 chance of +1 bonus to you or the enemy.</li>
                     <li><strong>Reposition:</strong> Roll to attempt to change combat range. Reposition auto fails with suppression. Cover is rerolled upon reposition success.</li>
                     <li><strong>Hunker Down:</strong> Only way to counter suppress. Automatically repositions 1 range closer under suppression and action selection resets. Cover -1 or +1 against flank and fortify, but no effect for overwatch.</li>
-                    <li><strong>Retreat:</strong> Roll to retreat Big 3: no impact on reposition, but big 3 action succeeds if reposition fails.</li>
+                    <li><strong>Retreat:</strong> Roll to retreat. Big 3: no impact on reposition, but big 3 action succeeds if reposition fails.</li>
                     <li><strong>Flank:</strong> Beats fortify +1 combat roll, + (opponent cover reduced to none)</li>
                     <li><strong>Overwatch:</strong> Beats flank +1 combat roll, no additional flank bonus. However, (+2 bonus if reposition fails)</li>
                     <li><strong>Fortify:</strong> Beats Overwatch +1 combat roll, + (+1 cover quality)</li>
                 </ol>
-                
-                <p style="margin-top: 15px;"><strong>x symbol</strong> = ineffective at that range and no attachment can help with the exception of the masterkey and underbarrel grenade launcher. Max 6 rating with attachments for Rifles, max 7 for Snipers, and max 8 for SMGs/shotgun.</p>
-                
-                <p style="margin-top: 15px;"><strong>Rock-paper-scissors gameplay interactions:</strong> Fortify > Overwatch > Flank > Fortify</p>
-                
-                <p style="margin-top: 15px;"><strong>You can only equip 1 specialty gear at a time.</strong></p>
-                
-                <h3 style="color: #e94560; margin-top: 25px;">Other Details</h3>
-                
-                <p style="margin-top: 15px;">Everything is decided by a random dice roll. Enemy AI decisions are 50% random, and 50% optimal/informed. You have to survive 4 engagements to win. Dice rolls decide what weapons/attachments you and the enemy start with, current cover status, intel status, and current engagement range from R1 through R6.</p>
-                
-                <h4 style="color: #00d4ff; margin-top: 15px;">Main Phases:</h4>
-                <ul style="line-height: 1.8; margin-left: 20px;">
+
+                <h3 style="color: #e94560; margin-top: 20px;">Combat & Ratings:</h3>
+                <ul style="line-height: 1.8; color: #fff;">
+                    <li><strong>x symbol</strong> = ineffective at that range and no attachment can help with the exception of the masterkey and underbarrel grenade launcher.</li>
+                    <li>Max 6 rating with attachments for Rifles</li>
+                    <li>Max 7 for Snipers</li>
+                    <li>Max 8 for SMGs/shotgun</li>
+                </ul>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Rock-Paper-Scissors Gameplay:</h3>
+                <p style="color: #00ff88; font-size: 1.2em; text-align: center;">Fortify > Overwatch > Flank > Fortify</p>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Important Restrictions:</h3>
+                <p style="color: #fff;">You can only equip <strong>1 specialty gear</strong> at a time.</p>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Other Information:</h3>
+                <ul style="line-height: 1.8; color: #fff;">
+                    <li>Everything is decided by a random dice roll.</li>
+                    <li>Enemy AI decisions are 50% random, and 50% optimal/informed.</li>
+                    <li>You have to survive 4 engagements to win.</li>
+                    <li>Dice rolls decide what weapons/attachments you and the enemy start with, current cover status, intel status, and current engagement range from R1 through R6.</li>
+                </ul>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Main Phases:</h3>
+                <ol style="line-height: 1.8; color: #fff;">
                     <li><strong>Intel Roll:</strong> Automatically decides if you or the enemy gets information about the other's loadout. Also generates all engagement settings. No input required.</li>
                     <li><strong>Choose Tactical Action:</strong> Select 1 of 6 choices, and the enemy will have already selected his tactical action via dice roll with decision matrix.</li>
                     <li><strong>Tactical Resolution:</strong> Summary of how your actions is provided and all player vs enemy actions are resolved.</li>
                     <li><strong>Combat Phase:</strong> Combat is decided with a D8 dice roll, and higher score wins. Score = Combat roll + Range Rating + Cover Rating + Tactical Bonus.</li>
-                    <li><strong>Tactical Resupply:</strong> Choose any 2 items to loot. You have 2 weapon slots and 6 attachments slots per weapon. These can be attachments can be changed any time by dragging the attachment from one gun to another, or into the extra attachments box. You will never lose an attachment in this phase, but the weapon will replace the current weapon in the slot you decide.</li>
+                    <li><strong>Tactical Resupply:</strong> Choose any 2 items to loot. You have 2 weapon slots and 6 attachments slots per weapon. These attachments can be changed any time by dragging the attachment from one gun to another, or into the extra attachments box. You will never lose an attachment in this phase, but the weapon will replace the current weapon in the slot you decide.</li>
+                </ol>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Miscellaneous Info:</h3>
+                <ul style="line-height: 1.8; color: #fff;">
+                    <li>All weapons have base range stats that add up to 8.</li>
+                    <li>There are 20 weapons with effective ranges that are largely consistent with real world counterparts, and 39 attachments.</li>
+                    <li>Combat log has some extra behind the scene information like what the decision dice roll was for the enemy AI: 1-5 are always the same base decisions, and 6-8 are the best decisions.</li>
+                    <li>Gear has active, passive or both abilities.</li>
+                    <li>The enemy can not use gear, only the player.</li>
+                    <li>Don't leave gear on the ground if you want to use it.</li>
                 </ul>
-                
-                <h4 style="color: #00d4ff; margin-top: 15px;">Miscellaneous Info:</h4>
-                <p style="margin-top: 10px;">All weapons have base range stats that add up to 8. There are 20 weapons with effective ranges that are largely consistent with real world counterparts, and 39 attachments. Combat log has some extra behind the scene information like what the decision dice roll was for the enemy AI: 1-5 are always the same base decisions, and 6-8 are the best decisions. Gear has active, passive or both abilities. The enemy can not use gear, only the player. Don't leave gear on the ground if you want to use it.</p>
-                
-                <h4 style="color: #00d4ff; margin-top: 15px;">Gear Carry Amount:</h4>
-                <ol style="line-height: 1.8; margin-left: 20px;">
+
+                <h3 style="color: #e94560; margin-top: 20px;">Gear Carry Amount:</h3>
+                <ol start="8" style="line-height: 1.8; color: #fff;">
                     <li><strong>Pack Slot:</strong> Holds 1L, 1V, 2M, or 3S</li>
                     <li><strong>Vest Slot:</strong> Holds 1V, 1M, or 2S</li>
                     <li><strong>Harness Slot:</strong> Holds 1W (If occupied it will display in weapon slot 2), 2M, or 2S</li>
@@ -2889,11 +2754,12 @@
                     <li><strong>Primary Slot:</strong> Holds 1W</li>
                     <li><strong>Pouch Slot:</strong> Just a place to drop items to sell, and holds coins for purchase</li>
                 </ol>
-                
-                <p style="margin-top: 15px;">All items are worth 1 coin no matter the size or item. Black market has randomized prices 2-6 coins, and 6-8 for suppressor. Top 2 options are always suppressor and a level II Plate.</p>
+
+                <h3 style="color: #e94560; margin-top: 20px;">Economy:</h3>
+                <p style="color: #fff;">All items are worth 1 coin no matter the size or item. Black market has randomized prices 2-6 coins, and 6-8 for suppressor. Top 2 options are always suppressor and a level II Plate.</p>
             </div>
-            
-            <button class="confirm-btn" onclick="closeGameInfo()" style="margin-top: 20px;">Close</button>
+
+            <button class="confirm-btn" onclick="closeGameInfo()" style="margin-top: 20px;">Back to Menu</button>
         </div>
     </div>
 
@@ -3091,7 +2957,7 @@
         const RANGE_POOL = generateRangePool();
 
         // History Management
-        async function saveToHistory(data) {
+        function saveToHistory(data) {
             try {
                 // Collect all weapons used (primary + harness)
                 const weaponsUsed = [];
@@ -3116,37 +2982,30 @@
                     });
                 }
                 
-                // Get existing history
-                const historyData = await window.storage.get('overwatchHistory', false);
-                let history = historyData ? JSON.parse(historyData.value) : [];
-                
+                let history = JSON.parse(localStorage.getItem('overwatchHistory') || '[]');
                 history.push({
                     ...data,
                     timestamp: new Date().toISOString(),
                     weaponsUsed: weaponsUsed
                 });
-                
-                await window.storage.set('overwatchHistory', JSON.stringify(history), false);
-                return true;
+                localStorage.setItem('overwatchHistory', JSON.stringify(history));
             } catch (e) {
                 console.error('Failed to save history:', e);
-                return false;
             }
         }
 
-        async function getHistory() {
+        function getHistory() {
             try {
-                const result = await window.storage.get('overwatchHistory', false);
-                return result ? JSON.parse(result.value) : [];
+                return JSON.parse(localStorage.getItem('overwatchHistory') || '[]');
             } catch (e) {
                 console.error('Failed to load history:', e);
                 return [];
             }
         }
 
-        async function clearHistory() {
+        function clearHistory() {
             try {
-                await window.storage.delete('overwatchHistory', false);
+                localStorage.removeItem('overwatchHistory');
                 log('History cleared', 'success');
             } catch (e) {
                 console.error('Failed to clear history:', e);
@@ -3158,103 +3017,99 @@
             const modal = document.getElementById('historyModal');
             const content = document.getElementById('historyContent');
             
-            getHistory().then(history => {
-                let html = '<h2>📜 Mission History</h2>';
+            const history = getHistory();
+            
+            let html = '<h2>📜 Mission History</h2>';
+            
+            if (history.length === 0) {
+                html += '<p style="text-align: center; padding: 40px; color: #aaa;">No mission history yet. Complete missions to build your record.</p>';
+            } else {
+                html += '<div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">';
                 
-                if (history.length === 0) {
-                    html += '<p style="text-align: center; padding: 40px; color: #aaa;">No mission history yet. Complete missions to build your record.</p>';
-                } else {
-                    html += '<div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">';
+                // Display in reverse order (newest first)
+                for (let i = history.length - 1; i >= 0; i--) {
+                    const record = history[i];
+                    const date = new Date(record.timestamp);
+                    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
                     
-                    // Display in reverse order (newest first)
-                    for (let i = history.length - 1; i >= 0; i--) {
-                        const record = history[i];
-                        const date = new Date(record.timestamp);
-                        const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-                        
-                        const difficultyNames = ['', 'Normal', 'Veteran', 'Spec Ops', 'Ghost'];
-                        const difficultyColors = ['', '#0f3460', '#e94560', '#ff8844', '#ffd700'];
-                        
-                        let gradeColor = '#ff4444';
-                        if (record.grade === 'S') gradeColor = '#ffd700';
-                        else if (record.grade === 'A') gradeColor = '#00ff88';
-                        else if (record.grade === 'B') gradeColor = '#00d4ff';
-                        else if (record.grade === 'C') gradeColor = '#ffaa00';
-                        else if (record.grade === 'D') gradeColor = '#ff8844';
-                        
-                        html += `<div style="background: rgba(15, 52, 96, 0.3); border: 2px solid #0f3460; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
-                        html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">`;
-                        
-                        // Left side: Date + Weapon icons
-                        html += `<div style="display: flex; align-items: center; gap: 10px;">`;
-                        html += `<div style="font-size: 0.9em; color: #aaa;">${dateStr}</div>`;
-                        
-                        // Weapon icons
-                        if (record.weaponsUsed && record.weaponsUsed.length > 0) {
-                            html += `<div style="display: flex; gap: 5px;">`;
-                            record.weaponsUsed.forEach(weapon => {
-                                html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 40px; height: 30px; object-fit: contain; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));">`;
-                            });
-                            html += `</div>`;
-                        }
-                        
-                        html += `</div>`;
-                        
-                        // Right side: Grade
-                        html += `<div style="font-size: 1.5em; font-weight: bold; color: ${gradeColor};">Grade: ${record.grade}</div>`;
-                        html += `</div>`;
-                        
-                        html += `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
-                        html += `<div><strong>Difficulty:</strong> <span style="color: ${difficultyColors[record.difficulty]};">${difficultyNames[record.difficulty]}</span></div>`;
-                        html += `<div><strong>Score:</strong> ${record.score}</div>`;
-                        html += `<div><strong>Kills:</strong> ${record.engagements}</div>`;
-                        html += `<div><strong>Result:</strong> <span style="color: ${record.victory ? '#00ff88' : '#ff4444'};">${record.victory ? 'Victory' : 'Defeat'}</span></div>`;
-                        html += `</div>`;
+                    const difficultyNames = ['', 'Normal', 'Veteran', 'Spec Ops', 'Ghost'];
+                    const difficultyColors = ['', '#0f3460', '#e94560', '#ff8844', '#ffd700'];
+                    
+                    let gradeColor = '#ff4444';
+                    if (record.grade === 'S') gradeColor = '#ffd700';
+                    else if (record.grade === 'A') gradeColor = '#00ff88';
+                    else if (record.grade === 'B') gradeColor = '#00d4ff';
+                    else if (record.grade === 'C') gradeColor = '#ffaa00';
+                    else if (record.grade === 'D') gradeColor = '#ff8844';
+                    
+                    html += `<div style="background: rgba(15, 52, 96, 0.3); border: 2px solid #0f3460; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
+                    html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">`;
+                    
+                    // Left side: Date + Weapon icons
+                    html += `<div style="display: flex; align-items: center; gap: 10px;">`;
+                    html += `<div style="font-size: 0.9em; color: #aaa;">${dateStr}</div>`;
+                    
+                    // Weapon icons
+                    if (record.weaponsUsed && record.weaponsUsed.length > 0) {
+                        html += `<div style="display: flex; gap: 5px;">`;
+                        record.weaponsUsed.forEach(weapon => {
+                            html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 40px; height: 30px; object-fit: contain; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));">`;
+                        });
                         html += `</div>`;
                     }
                     
-                    html += '</div>';
+                    html += `</div>`;
                     
-                    // Calculate totals
-                    const totals = calculateTotals(history);
+                    // Right side: Grade
+                    html += `<div style="font-size: 1.5em; font-weight: bold; color: ${gradeColor};">Grade: ${record.grade}</div>`;
+                    html += `</div>`;
                     
-                    html += '<div style="background: rgba(233, 69, 96, 0.2); border: 2px solid #e94560; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
-                    html += '<h3 style="color: #e94560; margin-bottom: 15px; text-align: center;">📊 Career Totals</h3>';
-                    
-                    html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">';
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Successful Missions</div><div style="font-size: 1.8em; font-weight: bold; color: #00ff88;">${totals.successfulMissions}</div></div>`;
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Kills</div><div style="font-size: 1.8em; font-weight: bold; color: #00d4ff;">${totals.kills}</div></div>`;
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KD Ratio</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.kdRatio}</div></div>`;
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KIA</div><div style="font-size: 1.8em; font-weight: bold; color: #ff4444;">${totals.kia}</div></div>`;
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Total Score</div><div style="font-size: 1.8em; font-weight: bold; color: #fff;">${totals.totalScore}</div></div>`;
-                    html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Best Score</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.bestScore}</div></div>`;
-                    html += '</div>';
-                    
-                    // Weapons Used
-                    html += '<div style="text-align: center; margin-top: 10px;">';
-                    html += '<div style="font-size: 0.9em; color: #aaa; margin-bottom: 8px;">Weapons Used</div>';
-                    html += '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
-                    totals.uniqueWeapons.forEach(weapon => {
-                        html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 50px; height: 38px; object-fit: contain; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5)); border: 1px solid #0f3460; border-radius: 4px; background: rgba(15, 52, 96, 0.3); padding: 4px;">`;
-                    });
-                    html += '</div>';
-                    html += '</div>';
-                    
-                    html += '</div>';
+                    html += `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+                    html += `<div><strong>Difficulty:</strong> <span style="color: ${difficultyColors[record.difficulty]};">${difficultyNames[record.difficulty]}</span></div>`;
+                    html += `<div><strong>Score:</strong> ${record.score}</div>`;
+                    html += `<div><strong>Kills:</strong> ${record.engagements}</div>`;
+                    html += `<div><strong>Result:</strong> <span style="color: ${record.victory ? '#00ff88' : '#ff4444'};">${record.victory ? 'Victory' : 'Defeat'}</span></div>`;
+                    html += `</div>`;
+                    html += `</div>`;
                 }
                 
-                html += '<div style="display: flex; gap: 15px; margin-top: 20px;">';
-                html += '<button class="confirm-btn" onclick="closeHistoryModal()" style="flex: 1; background: #0f3460; border-color: #0f3460;">Continue</button>';
-                html += '<button class="confirm-btn" onclick="confirmDeleteHistory()" style="flex: 1; background: #ff4444; border-color: #ff4444;">Delete History</button>';
                 html += '</div>';
                 
-                content.innerHTML = html;
-                modal.classList.add('active');
-            }).catch(e => {
-                console.error('Failed to load history:', e);
-                content.innerHTML = '<h2>📜 Mission History</h2><p style="text-align: center; padding: 40px; color: #ff4444;">Failed to load history</p>';
-                modal.classList.add('active');
-            });
+                // Calculate totals
+                const totals = calculateTotals(history);
+                
+                html += '<div style="background: rgba(233, 69, 96, 0.2); border: 2px solid #e94560; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+                html += '<h3 style="color: #e94560; margin-bottom: 15px; text-align: center;">📊 Career Totals</h3>';
+                
+                html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">';
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Successful Missions</div><div style="font-size: 1.8em; font-weight: bold; color: #00ff88;">${totals.successfulMissions}</div></div>`;
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Kills</div><div style="font-size: 1.8em; font-weight: bold; color: #00d4ff;">${totals.kills}</div></div>`;
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KD Ratio</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.kdRatio}</div></div>`;
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KIA</div><div style="font-size: 1.8em; font-weight: bold; color: #ff4444;">${totals.kia}</div></div>`;
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Total Score</div><div style="font-size: 1.8em; font-weight: bold; color: #fff;">${totals.totalScore}</div></div>`;
+                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Best Score</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.bestScore}</div></div>`;
+                html += '</div>';
+                
+                // Weapons Used
+                html += '<div style="text-align: center; margin-top: 10px;">';
+                html += '<div style="font-size: 0.9em; color: #aaa; margin-bottom: 8px;">Weapons Used</div>';
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
+                totals.uniqueWeapons.forEach(weapon => {
+                    html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 50px; height: 38px; object-fit: contain; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5)); border: 1px solid #0f3460; border-radius: 4px; background: rgba(15, 52, 96, 0.3); padding: 4px;">`;
+                });
+                html += '</div>';
+                html += '</div>';
+                
+                html += '</div>';
+            }
+            
+            html += '<div style="display: flex; gap: 15px; margin-top: 20px;">';
+            html += '<button class="confirm-btn" onclick="closeHistoryModal()" style="flex: 1; background: #0f3460; border-color: #0f3460;">Continue</button>';
+            html += '<button class="confirm-btn" onclick="confirmDeleteHistory()" style="flex: 1; background: #ff4444; border-color: #ff4444;">Delete History</button>';
+            html += '</div>';
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
         }
         
         function calculateTotals(history) {
@@ -3396,12 +3251,11 @@
                 spallingInjury: false,
                 mobilityImpaired: false
             },
-            utilizedGear: null
+            utilizedGear: null,
+            combatHasOccurred: false // Track if combat has happened this engagement
         };
 
         let draggedItem = null;
-        let touchDragItem = null;
-        let touchStartPos = null;
         let devToolsEnabled = false;
         let devToolsClickCount = 0;
         let devToolsClickTimer = null;
@@ -3412,59 +3266,36 @@
         let audioCtx;
         let masterGain;
         let convolver;
-        let audioEnabled = true;
 
         function initAudio() {
             if (audioCtx) return;
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-                masterGain = audioCtx.createGain();
-                masterGain.gain.value = 0.9;
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.9;
 
-                convolver = audioCtx.createConvolver();
-                convolver.buffer = impulse(0.16, 3.0);
+            convolver = audioCtx.createConvolver();
+            convolver.buffer = impulse(0.16, 3.0);
 
-                const wet = audioCtx.createGain();
-                const dry = audioCtx.createGain();
-                wet.gain.value = 0.7;
-                dry.gain.value = 0.9;
+            const wet = audioCtx.createGain();
+            const dry = audioCtx.createGain();
+            wet.gain.value = 0.7;
+            dry.gain.value = 0.9;
 
-                masterGain.connect(dry).connect(audioCtx.destination);
-                masterGain.connect(convolver).connect(wet).connect(audioCtx.destination);
-            } catch (e) {
-                console.warn('Audio initialization failed:', e);
-                audioEnabled = false;
-                audioCtx = null;
-            }
-        }
-        
-        async function resumeAudioContext() {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                try {
-                    await audioCtx.resume();
-                } catch (e) {
-                    console.warn('Audio context resume failed:', e);
-                }
-            }
+            masterGain.connect(dry).connect(audioCtx.destination);
+            masterGain.connect(convolver).connect(wet).connect(audioCtx.destination);
         }
 
         function impulse(d, decay) {
-            if (!audioCtx) return null;
-            try {
-                const len = audioCtx.sampleRate * d;
-                const buf = audioCtx.createBuffer(2, len, audioCtx.sampleRate);
-                for (let c = 0; c < 2; c++) {
-                    const data = buf.getChannelData(c);
-                    for (let i = 0; i < len; i++) {
-                        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
-                    }
+            const len = audioCtx.sampleRate * d;
+            const buf = audioCtx.createBuffer(2, len, audioCtx.sampleRate);
+            for (let c = 0; c < 2; c++) {
+                const data = buf.getChannelData(c);
+                for (let i = 0; i < len; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
                 }
-                return buf;
-            } catch (e) {
-                console.warn('Impulse creation failed:', e);
-                return null;
             }
+            return buf;
         }
 
         function env(g, t, a, d) {
@@ -3554,166 +3385,123 @@
             o.stop(t + 0.1);
         }
 
+        // Full Rack sound
         function playFullRackSound() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                
-                // Resume audio context for mobile
-                resumeAudioContext();
-                
-                const t0 = audioCtx.currentTime + 0.005;
+            initAudio();
+            const t0 = audioCtx.currentTime + 0.005;
 
-                // Pull
-                shock(t0);
-                boltMass(t0);
-                slide(t0);
-                metal(t0);
-                muzzleRing(t0);
+            // Pull
+            shock(t0);
+            boltMass(t0);
+            slide(t0);
+            metal(t0);
+            muzzleRing(t0);
 
-                // Release (compressed timing)
-                const t1 = t0 + 0.36;
-                shock(t1);
-                boltMass(t1);
-                slide(t1);
-                metal(t1);
-                muzzleRing(t1);
-            } catch (e) {
-                console.warn('Audio playback failed:', e);
-            }
+            // Release (compressed timing)
+            const t1 = t0 + 0.36;
+            shock(t1);
+            boltMass(t1);
+            slide(t1);
+            metal(t1);
+            muzzleRing(t1);
         }
 
         // Metallic click/beep for button presses
         function playButtonClick() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                
-                // Resume audio context for mobile
-                resumeAudioContext();
-                
-                const t = audioCtx.currentTime;
+            initAudio();
+            const t = audioCtx.currentTime;
 
-                // Low frequency metallic tone
-                const osc = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                
-                osc.type = "sine";
-                osc.frequency.setValueAtTime(280, t);
-                osc.frequency.exponentialRampToValueAtTime(220, t + 0.05);
-                
-                g.gain.setValueAtTime(0.3, t);
-                g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-                
-                osc.connect(g).connect(masterGain);
-                osc.start(t);
-                osc.stop(t + 0.1);
+            // Low frequency metallic tone
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(280, t);
+            osc.frequency.exponentialRampToValueAtTime(220, t + 0.05);
+            
+            g.gain.setValueAtTime(0.3, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+            
+            osc.connect(g).connect(masterGain);
+            osc.start(t);
+            osc.stop(t + 0.1);
 
-                // Add a subtle metallic noise burst
-                const n = noise(0.015);
-                const bp = audioCtx.createBiquadFilter();
-                bp.type = "bandpass";
-                bp.frequency.value = 350;
-                bp.Q.value = 2;
-                const ng = audioCtx.createGain();
-                
-                ng.gain.setValueAtTime(0.08, t);
-                ng.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
-                
-                n.connect(bp).connect(ng).connect(masterGain);
-                n.start(t);
-                n.stop(t + 0.02);
-            } catch (e) {
-                console.warn('Audio playback failed:', e);
-            }
+            // Add a subtle metallic noise burst
+            const n = noise(0.015);
+            const bp = audioCtx.createBiquadFilter();
+            bp.type = "bandpass";
+            bp.frequency.value = 350;
+            bp.Q.value = 2;
+            const ng = audioCtx.createGain();
+            
+            ng.gain.setValueAtTime(0.08, t);
+            ng.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+            
+            n.connect(bp).connect(ng).connect(masterGain);
+            n.start(t);
+            n.stop(t + 0.02);
         }
 
         // Attachment Click sound for UI selections
         function playAttachmentClick() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                
-                // Resume audio context for mobile
-                resumeAudioContext();
-                
-                const t = audioCtx.currentTime + 0.005;
-                
-                // Sharp mechanical transient
-                const n = noise(0.012);
-                const hp = audioCtx.createBiquadFilter();
-                hp.type = "highpass";
-                hp.frequency.value = 2200;
-                const g = audioCtx.createGain();
-                env(g, t, 0.18, 0.025);
-                n.connect(hp).connect(g).connect(masterGain);
-                n.start(t);
-                n.stop(t + 0.03);
-                
-                // Low-mid polymer / rail contact
-                const o = audioCtx.createOscillator();
-                const g2 = audioCtx.createGain();
-                o.type = "triangle";
-                o.frequency.value = 140;
-                env(g2, t, 0.25, 0.08);
-                o.connect(g2).connect(masterGain);
-                o.start(t);
-                o.stop(t + 0.1);
-                
-                // Subtle metallic resonance
-                const o2 = audioCtx.createOscillator();
-                const g3 = audioCtx.createGain();
-                o2.type = "sine";
-                o2.frequency.value = 4800;
-                env(g3, t + 0.004, 0.07, 0.09);
-                o2.connect(g3).connect(masterGain);
-                o2.start(t + 0.004);
-                o2.stop(t + 0.114);
-            } catch (e) {
-                console.warn('Audio playback failed:', e);
-            }
+            initAudio();
+            const t = audioCtx.currentTime + 0.005;
+            
+            // Sharp mechanical transient
+            const n = noise(0.012);
+            const hp = audioCtx.createBiquadFilter();
+            hp.type = "highpass";
+            hp.frequency.value = 2200;
+            const g = audioCtx.createGain();
+            env(g, t, 0.18, 0.025);
+            n.connect(hp).connect(g).connect(masterGain);
+            n.start(t);
+            n.stop(t + 0.03);
+            
+            // Low-mid polymer / rail contact
+            const o = audioCtx.createOscillator();
+            const g2 = audioCtx.createGain();
+            o.type = "triangle";
+            o.frequency.value = 140;
+            env(g2, t, 0.25, 0.08);
+            o.connect(g2).connect(masterGain);
+            o.start(t);
+            o.stop(t + 0.1);
+            
+            // Subtle metallic resonance
+            const o2 = audioCtx.createOscillator();
+            const g3 = audioCtx.createGain();
+            o2.type = "sine";
+            o2.frequency.value = 4800;
+            env(g3, t + 0.004, 0.07, 0.09);
+            o2.connect(g3).connect(masterGain);
+            o2.start(t + 0.004);
+            o2.stop(t + 0.114);
         }
 
         // Fifty Cal Canyon Shot sound for combat roll
         let canyonVerb;
         
         function initCanyonAudio() {
-            if (canyonVerb || !audioCtx) return;
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                
-                canyonVerb = audioCtx.createConvolver();
-                const buffer = canyonImpulse(3.4, 4.8);
-                if (buffer) {
-                    canyonVerb.buffer = buffer;
-                }
-            } catch (e) {
-                console.warn('Canyon audio initialization failed:', e);
-            }
+            if (canyonVerb) return; // Already initialized
+            initAudio(); // Ensure main audio is initialized
+            
+            canyonVerb = audioCtx.createConvolver();
+            canyonVerb.buffer = canyonImpulse(3.4, 4.8);
         }
 
         function canyonImpulse(duration, decay) {
-            if (!audioCtx) return null;
-            try {
-                const sr = audioCtx.sampleRate;
-                const len = Math.floor(sr * duration);
-                const buf = audioCtx.createBuffer(2, len, sr);
-                for (let ch = 0; ch < 2; ch++) {
-                    const d = buf.getChannelData(ch);
-                    for (let i = 0; i < len; i++) {
-                        const t = i / len;
-                        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, decay);
-                    }
+            const sr = audioCtx.sampleRate;
+            const len = Math.floor(sr * duration);
+            const buf = audioCtx.createBuffer(2, len, sr);
+            for (let ch = 0; ch < 2; ch++) {
+                const d = buf.getChannelData(ch);
+                for (let i = 0; i < len; i++) {
+                    const t = i / len;
+                    d[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, decay);
                 }
-                return buf;
-            } catch (e) {
-                console.warn('Canyon impulse creation failed:', e);
-                return null;
             }
+            return buf;
         }
 
         function muzzleBoom(t) {
@@ -3771,23 +3559,13 @@
         }
 
         function playFiftyCalShot() {
-            if (!audioEnabled) return;
-            try {
-                initAudio();
-                initCanyonAudio();
-                if (!audioCtx) return;
-                
-                // Resume audio context for mobile
-                resumeAudioContext();
-                
-                const t = audioCtx.currentTime + 0.01;
-                
-                muzzleBoom(t);
-                shockFront(t + 0.003);
-                pressureTail(t + 0.015);
-            } catch (e) {
-                console.warn('Audio playback failed:', e);
-            }
+            initAudio();
+            initCanyonAudio();
+            const t = audioCtx.currentTime + 0.01;
+            
+            muzzleBoom(t);
+            shockFront(t + 0.003);
+            pressureTail(t + 0.015);
         }
 
         // Initialize title weapons on page load
@@ -4373,8 +4151,6 @@
             if (!leftBg || !rightBg) return;
             
             const weaponIds = Object.keys(WEAPONS);
-            if (!weaponIds || weaponIds.length === 0) return;
-            
             const shuffled = weaponIds.sort(() => 0.5 - Math.random());
             
             // Left side - first 10 weapons
@@ -4463,6 +4239,9 @@
                 `${currentEngagement}`;
             
             resetTacticalActionsPanel();
+            
+            // Reset combat occurred flag for new engagement
+            gameState.combatHasOccurred = false;
             
             // Update environment effects
             updateEnvironmentEffects();
@@ -4706,12 +4485,13 @@
                 return;
             }
             
-            // Rolls 6-8: Situation-based decision (uses intel level check)
-            if (gameState.intelResult <= 4) {
-                // INFORMED DECISION TREE (Enemy has intel on you: No, Basic, or Partial)
+            // Rolls 6-8: Situation-based decision
+            // After first combat, enemy always uses informed decision (has intel on player)
+            if (gameState.combatHasOccurred || gameState.intelResult <= 4) {
+                // INFORMED DECISION TREE (Enemy has intel on you: No, Basic, Partial, or after first combat)
                 gameState.enemyAction = informedDecision(roll);
             } else {
-                // BLIND DECISION TREE (Enemy has no intel: you have Full Intel)
+                // BLIND DECISION TREE (Enemy has no intel: you have Full Intel and combat hasn't occurred yet)
                 gameState.enemyAction = blindDecision(roll);
             }
         }
@@ -5554,6 +5334,15 @@
         function rollCombat() {
             gameState.waitingForCombatRoll = false;
             
+            // Mark that combat has occurred in this engagement
+            gameState.combatHasOccurred = true;
+            
+            // After first combat roll, grant full intel for the rest of this engagement
+            if (gameState.intelResult < 5) {
+                gameState.intelResult = 5; // Upgrade to full intel
+                log('Combat reveals enemy details - Full intel acquired!', 'success');
+            }
+            
             // Play fifty cal shot sound
             playFiftyCalShot();
             
@@ -5667,6 +5456,9 @@
                     resultHTML += `<p style="margin-top: 10px; color: #fff;">${armorResult.message}</p>`;
                     resultHTML += '</div>';
                     document.getElementById('combatResultDisplay').innerHTML = resultHTML;
+                    
+                    // Reset combat occurred flag since engagement is restarting
+                    gameState.combatHasOccurred = false;
                     return;
                 } else if (armorResult.fatal) {
                     // Fatal second spalling - end game
@@ -5716,6 +5508,9 @@
                     resultHTML += `<p style="margin-top: 10px; color: #fff;">${armorResult.message}</p>`;
                     resultHTML += '</div>';
                     document.getElementById('combatResultDisplay').innerHTML = resultHTML;
+                    
+                    // Reset combat occurred flag since engagement is restarting
+                    gameState.combatHasOccurred = false;
                     return;
                 } else if (armorResult.fatal) {
                     // Fatal second spalling - end game
@@ -7309,7 +7104,7 @@
                 grade: grade,
                 victory: true,
                 completedMissions: 1
-            }).catch(e => console.error('History save failed:', e));
+            });
             
             let html = `
                 <div style="color: #00ff88; font-size: 3em; margin-bottom: 20px;">
@@ -7327,7 +7122,7 @@
             } else if (completedEngagements === 12) {
                 html += `
                     <div style="font-size: 2em; color: #ffd700; margin: 20px 0; font-weight: bold;">
-                        All Targets Down, you are a true ${currentDifficulty}
+                        All Targets Down, you are a true ${currentDifficultyName}
                     </div>
                 `;
             }
@@ -7449,7 +7244,7 @@
                 grade: grade,
                 victory: victory,
                 completedMissions: 0
-            }).catch(e => console.error('History save failed:', e));
+            });
             
             setTimeout(() => {
                 document.getElementById('gameScreen').classList.add('hidden');
@@ -7775,18 +7570,11 @@
             }
             
             const backgroundImage = `${setNumber}_${rangeCategory}.png`;
-            
-            // Only update if different from current to avoid repeated style changes
-            const currentBg = rangePanel.style.getPropertyValue('--range-bg');
-            const newBg = `url('${backgroundImage}')`;
-            
-            if (currentBg !== newBg) {
-                rangePanel.style.setProperty('--range-bg', newBg);
-                rangePanel.style.backgroundImage = `var(--range-bg)`;
-                rangePanel.style.backgroundSize = 'cover';
-                rangePanel.style.backgroundPosition = 'center';
-                rangePanel.style.backgroundRepeat = 'no-repeat';
-            }
+            rangePanel.style.setProperty('--range-bg', `url('${backgroundImage}')`);
+            rangePanel.style.backgroundImage = `var(--range-bg)`;
+            rangePanel.style.backgroundSize = 'cover';
+            rangePanel.style.backgroundPosition = 'center';
+            rangePanel.style.backgroundRepeat = 'no-repeat';
         }
 
         function updateCover(side, level) {
@@ -7854,12 +7642,8 @@
         }
 
         function createWeaponCard(weapon, weaponIdx, isPrimary = true) {
-            if (!weapon || !weapon.weaponData) {
-                return '<div class="weapon-card"><p style="color: #666;">Invalid weapon data</p></div>';
-            }
-            
             const ratings = weapon.displayRatings();
-            const baseRatings = weapon.baseRatings || [];
+            const baseRatings = weapon.baseRatings;
             const totalRatings = weapon.getTotalRatings();
             
             let html = `<div class="weapon-card">`;
@@ -7902,7 +7686,7 @@
                 
                 // Calculate attachment bonus for superscript
                 let attachmentBonus = 0;
-                if (baseRating !== null && baseRating !== undefined && totalRating !== null && totalRating !== undefined) {
+                if (baseRating !== null && totalRating !== null) {
                     attachmentBonus = totalRating - baseRating;
                 }
                 
@@ -8002,7 +7786,6 @@
             if (attId) {
                 const att = ATTACHMENTS[attId];
                 html += `<div class="attachment-slot-badge" draggable="${draggable}" ondragstart="dragAttachmentFromSlot(event, ${weaponIdx}, '${slot}')" 
-                    ontouchstart="handleTouchStart(event, 'weaponAttachment', ${weaponIdx}, '${slot}')" ontouchend="handleTouchEnd(event)"
                     data-att-id="${attId}" onmouseover="showTooltip(event, 'attachment', ${attId})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle};">`;
                 html += `<img src="${att.icon}" alt="${att.name}">`;
                 html += '</div>';
@@ -8015,10 +7798,6 @@
         }
 
         function createEnemyWeaponCard(weapon, intelLevel = 'full') {
-            if (!weapon || !weapon.name) {
-                return '<div class="weapon-card"><p style="color: #666;">Invalid weapon data</p></div>';
-            }
-            
             let html = `<div class="weapon-card">`;
             
             // Basic Intel - only show weapon type
@@ -8373,7 +8152,6 @@
             const cursorStyle = (isGearUpPhase || devToolsEnabled) ? 'grab' : 'default';
             
             let html = `<div class="gear-item size-${itemSize}" draggable="${draggable}" ondragstart="dragGearItem(event, '${slotName}', ${idx})" 
-                ontouchstart="handleTouchStart(event, 'gearSlot', '${slotName}', ${idx})" ontouchend="handleTouchEnd(event)"
                 onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle}; position: relative;">`;
             
             html += `<img src="${iconSrc}" style="object-fit: contain;">`;
@@ -8396,8 +8174,6 @@
 
         function updateGroundGear() {
             const container = document.getElementById('groundGearContents');
-            if (!container) return;
-            
             container.innerHTML = '';
             
             // Check if we're in gear up phase or dev tools are enabled
@@ -8420,17 +8196,14 @@
                         label = `Weapon (Size: W)`;
                     }
                 } else if (item.type === 'attachment') {
-                    if (!item.data) return; // Skip invalid items
                     iconSrc = item.data.icon;
                     label = `${item.data.name} (Size: S)`;
                 } else if (item.type === 'gear') {
-                    if (!item.data) return; // Skip invalid items
                     iconSrc = item.data.icon;
                     label = `${item.data.name} (Size: ${item.data.size})`;
                 }
                 
                 let html = `<div class="gear-item" draggable="${draggable}" ondragstart="dragGroundItem(event, ${idx})" 
-                    ontouchstart="handleTouchStart(event, 'ground', ${idx})" ontouchend="handleTouchEnd(event)"
                     onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle};">`;
                 
                 html += `<img src="${iconSrc}" style="width: 24px; height: 24px; object-fit: contain; margin-right: 5px;">`;
@@ -8444,8 +8217,6 @@
         // Tooltip
         function showTooltip(event, itemType, itemId) {
             const tooltip = document.getElementById('tooltip');
-            if (!tooltip) return;
-            
             let content = '';
             
             if (itemType === 'weapon') {
@@ -8459,12 +8230,10 @@
                 }
             } else if (itemType === 'attachment') {
                 const att = ATTACHMENTS[itemId];
-                if (!att) return;
                 content = `<strong>${att.name}</strong><br>${att.group}<br>Size: ${att.size}<br>${formatAttachmentRatings(itemId)}`;
                 highlightCompatibleSlots(att.size, att.group);
             } else if (itemType === 'gear') {
                 const gear = GEAR[itemId];
-                if (!gear) return;
                 
                 // Check if this gear is PE plates with HP
                 let sizeDisplay = `Size: ${gear.size}`;
@@ -8485,13 +8254,8 @@
             
             tooltip.innerHTML = content;
             tooltip.style.display = 'block';
-            
-            // Position based on touch or mouse
-            const x = event.touches ? event.touches[0].clientX : event.clientX;
-            const y = event.touches ? event.touches[0].clientY : event.clientY;
-            
-            tooltip.style.left = (x + 10) + 'px';
-            tooltip.style.top = (y + 10) + 'px';
+            tooltip.style.left = (event.clientX + 10) + 'px';
+            tooltip.style.top = (event.clientY + 10) + 'px';
         }
 
         function hideTooltip() {
@@ -8560,68 +8324,9 @@
             });
         }
 
-        // Drag and Drop with Touch Support
+        // Drag and Drop
         function allowDrop(event) {
             event.preventDefault();
-        }
-        
-        // Touch event handlers for mobile drag and drop
-        function handleTouchStart(event, source, ...args) {
-            const isGearUpPhase = !document.getElementById('gearUpPanel').classList.contains('hidden');
-            if (!isGearUpPhase && !devToolsEnabled) {
-                return;
-            }
-            
-            event.preventDefault();
-            const touch = event.touches[0];
-            touchStartPos = { x: touch.clientX, y: touch.clientY };
-            
-            if (source === 'ground') {
-                touchDragItem = { source: 'ground', idx: args[0] };
-            } else if (source === 'gearSlot') {
-                touchDragItem = { source: 'gearSlot', slotName: args[0], idx: args[1] };
-            } else if (source === 'weaponAttachment') {
-                touchDragItem = { source: 'weaponAttachment', weaponIdx: args[0], slot: args[1] };
-            }
-        }
-        
-        function handleTouchEnd(event) {
-            if (!touchDragItem) return;
-            
-            event.preventDefault();
-            const touch = event.changedTouches[0];
-            const endElement = document.elementFromPoint(touch.clientX, touch.clientY);
-            
-            if (!endElement) {
-                touchDragItem = null;
-                return;
-            }
-            
-            // Find the drop target
-            let dropTarget = endElement;
-            while (dropTarget && !dropTarget.dataset.slot && dropTarget.parentElement) {
-                dropTarget = dropTarget.parentElement;
-            }
-            
-            if (dropTarget && dropTarget.dataset.slot) {
-                // Temporarily set draggedItem for the drop handlers
-                draggedItem = touchDragItem;
-                
-                if (dropTarget.classList.contains('gear-slot')) {
-                    dropOnGearSlot(event, dropTarget.dataset.slot);
-                } else if (dropTarget.classList.contains('attachment-slot')) {
-                    const weaponIdx = parseInt(dropTarget.dataset.weaponIdx);
-                    const slot = dropTarget.dataset.slot;
-                    dropAttachmentOnSlot(event, weaponIdx, slot);
-                } else if (dropTarget.classList.contains('pouch-slot')) {
-                    dropOnPouch(event);
-                }
-                
-                draggedItem = null;
-            }
-            
-            touchDragItem = null;
-            touchStartPos = null;
         }
 
         function dragGearItem(event, slotName, idx) {
@@ -9151,7 +8856,7 @@
             } else if ([119, 120].includes(gearId)) { // Concussion Grenade
                 log('Concussion Grenade deployed!', 'success');
                 showGearResultPanel('Concussion Grenade', 'Tossed concussion grenade to disorient enemy. The enemy gets -1 combat score.');
-            } else if (gearId === 118) { // Deployable Cover - FIXED
+            } else if (gearId === 121) { // Disposable Rocket Launcher - FIXED
                 gameState.enemyCover = 0;
                 log('Rocket Launcher: Enemy cover destroyed!', 'success');
                 updateUI();
