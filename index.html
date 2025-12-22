@@ -740,10 +740,39 @@
             font-size: 0.9em;
         }
         
-        .theme-checkbox input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+        .toggle-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .toggle-btn {
+            background: rgba(15, 52, 96, 0.4);
+            border: 2px solid #0f3460;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            font-family: Arial, sans-serif;
+        }
+        
+        .toggle-btn:hover {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+        }
+        
+        .toggle-btn.enable.active {
+            background: rgba(0, 255, 136, 0.3);
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+        
+        .toggle-btn.disable.active {
+            background: rgba(233, 69, 96, 0.3);
+            border-color: #e94560;
+            color: #ff4444;
         }
 
         /* Weapon background decorations */
@@ -852,6 +881,14 @@
         body.theme-futuristic .panel > * {
             position: relative;
             z-index: 1;
+        }
+        
+        /* Disable animations class */
+        body.animations-disabled *,
+        body.animations-disabled *::before,
+        body.animations-disabled *::after {
+            animation: none !important;
+            transition: none !important;
         }
         
         /* Military theme override - 100% opaque solid backgrounds */
@@ -2475,6 +2512,30 @@
                 <button class="start-btn" onclick="startGame(2)" style="background: linear-gradient(135deg, #e94560, #8b2635);">BEGIN MISSION<br>ARMORED</button>
                 <button class="start-btn" onclick="showGameInfo()" style="background: linear-gradient(135deg, #00d4ff, #0096cc);">MORE GAME INFO</button>
             </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <span style="color: #fff; font-size: 0.9em;">🎬 Animations</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn enable active" id="startAnimationsEnable" onclick="setAnimations(true)">Enable</button>
+                        <button class="toggle-btn disable" id="startAnimationsDisable" onclick="setAnimations(false)">Disable</button>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <span style="color: #fff; font-size: 0.9em;">🔊 Audio</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn enable active" id="startAudioEnable" onclick="setAudio(true)">Enable</button>
+                        <button class="toggle-btn disable" id="startAudioDisable" onclick="setAudio(false)">Disable</button>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                    <span style="color: #fff; font-size: 0.9em;">🌍 Environment Effects</span>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn enable active" id="startEnvironmentEnable" onclick="setEnvironment(true)">Enable</button>
+                        <button class="toggle-btn disable" id="startEnvironmentDisable" onclick="setEnvironment(false)">Disable</button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div id="continueScreen" class="hidden start-screen panel">
@@ -2655,10 +2716,27 @@
                                 <option value="military">🪖 Military</option>
                             </select>
                         </div>
-                        <label class="theme-checkbox" style="justify-content: flex-start;">
-                            <input type="checkbox" id="environmentToggle" checked onchange="toggleEnvironment()">
-                            🌍 Environment Effects
-                        </label>
+                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                            <span style="color: #fff; font-size: 0.9em;">🎬 Animations</span>
+                            <div class="toggle-buttons">
+                                <button class="toggle-btn enable active" id="animationsEnable" onclick="setAnimations(true)">Enable</button>
+                                <button class="toggle-btn disable" id="animationsDisable" onclick="setAnimations(false)">Disable</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 15px;">
+                            <span style="color: #fff; font-size: 0.9em;">🔊 Audio</span>
+                            <div class="toggle-buttons">
+                                <button class="toggle-btn enable active" id="audioEnable" onclick="setAudio(true)">Enable</button>
+                                <button class="toggle-btn disable" id="audioDisable" onclick="setAudio(false)">Disable</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 15px;">
+                            <span style="color: #fff; font-size: 0.9em;">🌍 Environment Effects</span>
+                            <div class="toggle-buttons">
+                                <button class="toggle-btn enable active" id="environmentEnable" onclick="setEnvironment(true)">Enable</button>
+                                <button class="toggle-btn disable" id="environmentDisable" onclick="setEnvironment(false)">Disable</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2693,7 +2771,7 @@
             <h2 style="color: #00d4ff; margin-bottom: 20px;">📖 Game Information & Rules</h2>
             
             <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;">
-                <h3 style="color: #e94560; margin-top: 20px;">Main Important Info/Rules - Tactical Actions Guide:</h3>
+                <h3 style="color: #e94560; margin-top: 20px;">Tactical Actions Guide:</h3>
                 <ol style="line-height: 1.8; color: #fff;">
                     <li><strong>Suppress:</strong> Prevents opponent reposition. Interacts with big 3 with 50/50 chance of +1 bonus to you or the enemy.</li>
                     <li><strong>Reposition:</strong> Roll to attempt to change combat range. Reposition auto fails with suppression. Cover is rerolled upon reposition success.</li>
@@ -2726,7 +2804,7 @@
                     <li>Dice rolls decide what weapons/attachments you and the enemy start with, current cover status, intel status, and current engagement range from R1 through R6.</li>
                 </ul>
 
-                <h3 style="color: #e94560; margin-top: 20px;">Main Phases:</h3>
+                <h3 style="color: #e94560; margin-top: 20px;">Game Phases:</h3>
                 <ol style="line-height: 1.8; color: #fff;">
                     <li><strong>Intel Roll:</strong> Automatically decides if you or the enemy gets information about the other's loadout. Also generates all engagement settings. No input required.</li>
                     <li><strong>Choose Tactical Action:</strong> Select 1 of 6 choices, and the enemy will have already selected his tactical action via dice roll with decision matrix.</li>
@@ -2746,14 +2824,14 @@
                 </ul>
 
                 <h3 style="color: #e94560; margin-top: 20px;">Gear Carry Amount:</h3>
-                <ol start="8" style="line-height: 1.8; color: #fff;">
+                <ul style="line-height: 1.8; color: #fff;">
                     <li><strong>Pack Slot:</strong> Holds 1L, 1V, 2M, or 3S</li>
                     <li><strong>Vest Slot:</strong> Holds 1V, 1M, or 2S</li>
                     <li><strong>Harness Slot:</strong> Holds 1W (If occupied it will display in weapon slot 2), 2M, or 2S</li>
                     <li><strong>Belt Slot:</strong> Holds 3S</li>
                     <li><strong>Primary Slot:</strong> Holds 1W</li>
                     <li><strong>Pouch Slot:</strong> Just a place to drop items to sell, and holds coins for purchase</li>
-                </ol>
+                </ul>
 
                 <h3 style="color: #e94560; margin-top: 20px;">Economy:</h3>
                 <p style="color: #fff;">All items are worth 1 coin no matter the size or item. Black market has randomized prices 2-6 coins, and 6-8 for suppressor. Top 2 options are always suppressor and a level II Plate.</p>
@@ -2919,6 +2997,37 @@
         const RANGE_NAMES = ["R1 (50m)", "R2 (100m)", "R3 (150m)", "R4 (200m)", "R5 (400m)", "R6 (600m)"];
         const COVER_NAMES = ["No Cover", "Light Cover", "Heavy Cover"];
         
+        // Constants object for magic numbers
+        const CONSTANTS = {
+            CAPACITY_RULES: {
+                pack: { L: 1, V: 1, M: 2, S: 3 },
+                vest: { V: 1, M: 1, S: 2 },
+                harness: { W: 1, M: 2, S: 2 },
+                belt: { S: 3 },
+                primary: { W: 1 }
+            },
+            SLOT_RULES: {
+                pack: ['L', 'V', 'M', 'S'],
+                vest: ['V', 'M', 'S'],
+                harness: ['W', 'M', 'S'],
+                belt: ['S'],
+                primary: ['W']
+            },
+            RATING_CAPS: {
+                rifle: 6,
+                sniper: 7,
+                smg: 8,
+                shotgun: 8
+            },
+            FULLNESS_VALUES: {
+                pack: { L: 3, V: 3, M: 1.5, S: 1 },
+                vest: { V: 2, M: 2, S: 1 },
+                harness: { W: 50, M: 25, S: 25 },
+                harnessWithSling: { W: 35, M: 30, S: 30 }
+            },
+            DEBOUNCE_DELAY: 100
+        };
+        
         const ENEMY_NAMES = [
             "Ace", "Alibi", "Amaru", "Ash", "Bandit", "Barkov", "Battery", "Blackbeard", "Blitz", "Bookhart",
             "Bowman", "Brava", "Briggs", "Buck", "Bukharov", "Butcher", "Capitão", "Castle", "Caveira", "Clash",
@@ -2955,6 +3064,51 @@
         }
 
         const RANGE_POOL = generateRangePool();
+
+        // Cached DOM elements
+        const DOM = {
+            combatLog: null,
+            rangeInfo: null,
+            engagementHeader: null,
+            engagementStat: null,
+            intelStat: null,
+            playerLoadout: null,
+            enemyLoadout: null,
+            gearSlots: null,
+            groundGearContents: null,
+            tacticalActionsPanel: null,
+            combatRollPanel: null,
+            combatResultPanel: null,
+            gearUpPanel: null,
+            tooltip: null,
+            themeSelect: null,
+            environmentToggle: null,
+            init() {
+                this.combatLog = document.getElementById('combatLog');
+                this.rangeInfo = document.getElementById('rangeInfo');
+                this.engagementHeader = document.getElementById('engagementHeader');
+                this.engagementStat = document.getElementById('engagementStat');
+                this.intelStat = document.getElementById('intelStat');
+                this.playerLoadout = document.getElementById('playerLoadout');
+                this.enemyLoadout = document.getElementById('enemyLoadout');
+                this.gearSlots = document.getElementById('gearSlots');
+                this.groundGearContents = document.getElementById('groundGearContents');
+                this.tacticalActionsPanel = document.getElementById('tacticalActionsPanel');
+                this.combatRollPanel = document.getElementById('combatRollPanel');
+                this.combatResultPanel = document.getElementById('combatResultPanel');
+                this.gearUpPanel = document.getElementById('gearUpPanel');
+                this.tooltip = document.getElementById('tooltip');
+                this.themeSelect = document.getElementById('themeSelect');
+                this.environmentToggle = document.getElementById('environmentToggle');
+            }
+        };
+
+        // User preferences for animations and audio
+        let userPreferences = {
+            animationsEnabled: true,
+            audioEnabled: true,
+            environmentEnabled: true
+        };
 
         // History Management
         function saveToHistory(data) {
@@ -3262,13 +3416,22 @@
         let currentTheme = null;
         let environmentEnabled = true;
 
+        // Debounce helper
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
         // Audio context for procedural sound generation
         let audioCtx;
         let masterGain;
         let convolver;
 
         function initAudio() {
-            if (audioCtx) return;
+            if (audioCtx || !userPreferences.audioEnabled) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
             masterGain = audioCtx.createGain();
@@ -3387,6 +3550,7 @@
 
         // Full Rack sound
         function playFullRackSound() {
+            if (!userPreferences.audioEnabled) return;
             initAudio();
             const t0 = audioCtx.currentTime + 0.005;
 
@@ -3408,6 +3572,7 @@
 
         // Metallic click/beep for button presses
         function playButtonClick() {
+            if (!userPreferences.audioEnabled) return;
             initAudio();
             const t = audioCtx.currentTime;
 
@@ -3444,6 +3609,7 @@
 
         // Attachment Click sound for UI selections
         function playAttachmentClick() {
+            if (!userPreferences.audioEnabled) return;
             initAudio();
             const t = audioCtx.currentTime + 0.005;
             
@@ -3559,6 +3725,7 @@
         }
 
         function playFiftyCalShot() {
+            if (!userPreferences.audioEnabled) return;
             initAudio();
             initCanyonAudio();
             const t = audioCtx.currentTime + 0.01;
@@ -3570,6 +3737,7 @@
 
         // Initialize title weapons on page load
         window.addEventListener('DOMContentLoaded', () => {
+            DOM.init(); // Cache DOM elements
             updateStartTitleWeapons();
         });
 
@@ -3602,7 +3770,7 @@
                 // Toggle off
                 body.classList.remove(`theme-${theme}`);
                 currentTheme = null;
-                document.getElementById('themeSelect').value = 'none';
+                DOM.themeSelect.value = 'none';
             } else {
                 // Remove old theme
                 if (currentTheme) {
@@ -3611,7 +3779,7 @@
                 // Add new theme
                 body.classList.add(`theme-${theme}`);
                 currentTheme = theme;
-                document.getElementById('themeSelect').value = theme;
+                DOM.themeSelect.value = theme;
             }
             
             // Update the range display when theme changes
@@ -3619,8 +3787,7 @@
         }
 
         function toggleEnvironment() {
-            const checkbox = document.getElementById('environmentToggle');
-            environmentEnabled = checkbox.checked;
+            environmentEnabled = userPreferences.environmentEnabled;
             
             if (environmentEnabled) {
                 updateEnvironmentEffects();
@@ -3628,9 +3795,125 @@
                 document.getElementById('environmentEffects').innerHTML = '';
             }
         }
+        
+        function setAnimations(enabled) {
+            userPreferences.animationsEnabled = enabled;
+            
+            // Update all button states (both start screen and game screen)
+            const enableBtns = [document.getElementById('animationsEnable'), document.getElementById('startAnimationsEnable')];
+            const disableBtns = [document.getElementById('animationsDisable'), document.getElementById('startAnimationsDisable')];
+            
+            enableBtns.forEach(enableBtn => {
+                if (enableBtn) {
+                    if (enabled) {
+                        enableBtn.classList.add('active');
+                    } else {
+                        enableBtn.classList.remove('active');
+                    }
+                }
+            });
+            
+            disableBtns.forEach(disableBtn => {
+                if (disableBtn) {
+                    if (enabled) {
+                        disableBtn.classList.remove('active');
+                    } else {
+                        disableBtn.classList.add('active');
+                    }
+                }
+            });
+            
+            // Apply/remove animation styles
+            if (!enabled) {
+                document.body.classList.add('animations-disabled');
+            } else {
+                document.body.classList.remove('animations-disabled');
+            }
+        }
+        
+        function setAudio(enabled) {
+            userPreferences.audioEnabled = enabled;
+            
+            // Update all button states (both start screen and game screen)
+            const enableBtns = [document.getElementById('audioEnable'), document.getElementById('startAudioEnable')];
+            const disableBtns = [document.getElementById('audioDisable'), document.getElementById('startAudioDisable')];
+            
+            enableBtns.forEach(enableBtn => {
+                if (enableBtn) {
+                    if (enabled) {
+                        enableBtn.classList.add('active');
+                    } else {
+                        enableBtn.classList.remove('active');
+                    }
+                }
+            });
+            
+            disableBtns.forEach(disableBtn => {
+                if (disableBtn) {
+                    if (enabled) {
+                        disableBtn.classList.remove('active');
+                    } else {
+                        disableBtn.classList.add('active');
+                    }
+                }
+            });
+        }
+        
+        function setEnvironment(enabled) {
+            userPreferences.environmentEnabled = enabled;
+            environmentEnabled = enabled;
+            
+            // Update all button states (both start screen and game screen)
+            const enableBtns = [document.getElementById('environmentEnable'), document.getElementById('startEnvironmentEnable')];
+            const disableBtns = [document.getElementById('environmentDisable'), document.getElementById('startEnvironmentDisable')];
+            
+            enableBtns.forEach(enableBtn => {
+                if (enableBtn) {
+                    if (enabled) {
+                        enableBtn.classList.add('active');
+                    } else {
+                        enableBtn.classList.remove('active');
+                    }
+                }
+            });
+            
+            disableBtns.forEach(disableBtn => {
+                if (disableBtn) {
+                    if (enabled) {
+                        disableBtn.classList.remove('active');
+                    } else {
+                        disableBtn.classList.add('active');
+                    }
+                }
+            });
+            
+            // Apply environment effects
+            if (enabled) {
+                updateEnvironmentEffects();
+            } else {
+                document.getElementById('environmentEffects').innerHTML = '';
+            }
+        }
+        
+        function toggleAnimations() {
+            const checkbox = document.getElementById('animationsToggle');
+            userPreferences.animationsEnabled = checkbox.checked;
+            
+            // Apply/remove animation styles
+            if (!userPreferences.animationsEnabled) {
+                document.body.classList.add('animations-disabled');
+            } else {
+                document.body.classList.remove('animations-disabled');
+            }
+        }
+        
+        function toggleAudio() {
+            const checkbox = document.getElementById('audioToggle');
+            userPreferences.audioEnabled = checkbox.checked;
+        }
 
         function updateEnvironmentEffects() {
-            if (!environmentEnabled) return;
+            if (!environmentEnabled || !userPreferences.environmentEnabled) return;
             
             const container = document.getElementById('environmentEffects');
             container.innerHTML = '';
@@ -3673,7 +3956,8 @@
 
         // Combat Effects - restricted to tactical actions panel
         function triggerScreenShake() {
-            const panel = document.getElementById('tacticalActionsPanel');
+            if (!userPreferences.animationsEnabled) return;
+            const panel = DOM.tacticalActionsPanel;
             if (!panel) return;
             
             panel.classList.add('screen-shake');
@@ -3683,6 +3967,7 @@
         }
 
         function triggerScreenFlash() {
+            if (!userPreferences.animationsEnabled) return;
             // Create full-screen flash for combat
             const flash = document.createElement('div');
             flash.style.cssText = `
@@ -3705,6 +3990,7 @@
         }
 
         function triggerGlitch(elementId) {
+            if (!userPreferences.animationsEnabled) return;
             const element = document.getElementById(elementId);
             if (!element) return;
             
@@ -3999,12 +4285,7 @@
                 
                 // Cap ratings based on weapon type
                 // Rifles: max 6, Snipers: max 7, SMGs/Shotguns: max 8
-                let maxRating = 6; // Default for rifles
-                if (this.type === 'sniper') {
-                    maxRating = 7;
-                } else if (this.type === 'smg' || this.type === 'shotgun') {
-                    maxRating = 8;
-                }
+                const maxRating = CONSTANTS.RATING_CAPS[this.type] || 6;
                 
                 for (let i = 0; i < 6; i++) {
                     if (ratings[i] !== null && ratings[i] > maxRating) {
@@ -4090,7 +4371,7 @@
         }
 
         function log(message, type = 'info') {
-            const logDiv = document.getElementById('combatLog');
+            const logDiv = DOM.combatLog;
             const entry = document.createElement('div');
             entry.className = `log-entry ${type}`;
             entry.textContent = message;
@@ -7307,7 +7588,7 @@
 
         // Update UI
         function updateUI() {
-            const rangeInfoEl = document.getElementById('rangeInfo');
+            const rangeInfoEl = DOM.rangeInfo;
             if (rangeInfoEl) {
                 rangeInfoEl.textContent = getRangeDisplayName(gameState.currentRange, gameState.exactRangeMeters);
             }
@@ -7597,7 +7878,7 @@
         }
 
         function updatePlayerLoadout() {
-            const container = document.getElementById('playerLoadout');
+            const container = DOM.playerLoadout;
             container.innerHTML = '';
             
             updatePlayerWeaponsFromGear();
@@ -7620,7 +7901,7 @@
         }
 
         function updateEnemyLoadout(forceReveal = false) {
-            const container = document.getElementById('enemyLoadout');
+            const container = DOM.enemyLoadout;
             
             // Create header with enemy name
             let headerHTML = `<h2><img src="Bullet.png" style="width: 128px; height: 32px; vertical-align: middle; margin-right: 8px;"> ${gameState.enemyName ? gameState.enemyName + "'s" : "Enemy"} Loadout</h2>`;
@@ -8017,7 +8298,7 @@
 
         // Gear Slots Management
         function updateGearSlots() {
-            const container = document.getElementById('gearSlots');
+            const container = DOM.gearSlots;
             container.innerHTML = '';
             
             // Pack and Pouch row
@@ -8173,7 +8454,7 @@
         }
 
         function updateGroundGear() {
-            const container = document.getElementById('groundGearContents');
+            const container = DOM.groundGearContents;
             container.innerHTML = '';
             
             // Check if we're in gear up phase or dev tools are enabled
@@ -8214,9 +8495,15 @@
             });
         }
 
-        // Tooltip
+        // Tooltip with debouncing
+        const debouncedShowTooltip = debounce(showTooltipActual, CONSTANTS.DEBOUNCE_DELAY);
+        
         function showTooltip(event, itemType, itemId) {
-            const tooltip = document.getElementById('tooltip');
+            debouncedShowTooltip(event, itemType, itemId);
+        }
+        
+        function showTooltipActual(event, itemType, itemId) {
+            const tooltip = DOM.tooltip;
             let content = '';
             
             if (itemType === 'weapon') {
@@ -8259,7 +8546,7 @@
         }
 
         function hideTooltip() {
-            document.getElementById('tooltip').style.display = 'none';
+            DOM.tooltip.style.display = 'none';
             clearCompatibleSlots();
         }
 
@@ -9445,15 +9732,7 @@
                 size = item.data.size;
             }
             
-            const slotRules = {
-                pack: ['L', 'V', 'M', 'S'],
-                vest: ['V', 'M', 'S'],
-                harness: ['W', 'M', 'S'],
-                belt: ['S'],
-                primary: ['W']
-            };
-            
-            return slotRules[slotName].includes(size);
+            return CONSTANTS.SLOT_RULES[slotName].includes(size);
         }
 
         function hasCapacityForItem(item, slotName) {
@@ -9482,19 +9761,10 @@
                 counts[itemSize]++;
             });
             
-            // Slot capacity rules
-            const capacityRules = {
-                pack: { L: 1, V: 1, M: 2, S: 3 },
-                vest: { V: 1, M: 1, S: 2 },
-                harness: { W: 1, M: 2, S: 2 },
-                belt: { S: 3 },
-                primary: { W: 1 }
-            };
-            
             // Check if slot has capacity rules
-            if (!capacityRules[slotName]) return true;
+            if (!CONSTANTS.CAPACITY_RULES[slotName]) return true;
             
-            const rules = capacityRules[slotName];
+            const rules = CONSTANTS.CAPACITY_RULES[slotName];
             
             // If trying to add this size, check if we'd exceed capacity
             if (!rules[size]) return false; // Size not allowed in this slot
@@ -9502,39 +9772,37 @@
             // For pack: L, V, M, S are mutually exclusive in terms of "fullness"
             // Pack can hold: 1L OR 1V OR 2M OR 3S
             if (slotName === 'pack') {
-                // Calculate current "fullness" - each size takes different space
-                // L = 3 units, V = 3 units, M = 1.5 units, S = 1 unit (out of 3)
-                const fullness = counts.L * 3 + counts.V * 3 + counts.M * 1.5 + counts.S * 1;
-                const addingFullness = size === 'L' ? 3 : size === 'V' ? 3 : size === 'M' ? 1.5 : 1;
+                // Calculate current "fullness" using constants
+                const fullnessValues = CONSTANTS.FULLNESS_VALUES.pack;
+                const fullness = counts.L * fullnessValues.L + counts.V * fullnessValues.V + 
+                                counts.M * fullnessValues.M + counts.S * fullnessValues.S;
+                const addingFullness = fullnessValues[size] || 0;
                 return (fullness + addingFullness) <= 3;
             }
             
             // For vest: V, M, S are mutually exclusive
             // Vest can hold: 1V OR 1M OR 2S
             if (slotName === 'vest') {
-                const fullness = counts.V * 2 + counts.M * 2 + counts.S * 1;
-                const addingFullness = size === 'V' ? 2 : size === 'M' ? 2 : 1;
+                const fullnessValues = CONSTANTS.FULLNESS_VALUES.vest;
+                const fullness = counts.V * fullnessValues.V + counts.M * fullnessValues.M + counts.S * fullnessValues.S;
+                const addingFullness = fullnessValues[size] || 0;
                 return (fullness + addingFullness) <= 2;
             }
             
             // For harness: W, M, S are mutually exclusive
             // Harness can hold: 1W OR 2M OR 2S
             // With Weapon Sling: 2W + (1M OR 1S) OR 3M OR 3S
-            // Capacity calculation: W=35 units (2*35=70, leaving 30 for M/S), M=30 units, S=30 units (out of 100)
             if (slotName === 'harness') {
                 const hasWeaponSling = gameState.gearSlots.harness.some(item => item.type === 'gear' && item.id === 144);
                 
-                if (hasWeaponSling) {
-                    // With sling: W=35, M=30, S=30 (out of 100)
-                    const fullness = counts.W * 35 + counts.M * 30 + counts.S * 30;
-                    const addingFullness = size === 'W' ? 35 : size === 'M' ? 30 : 30;
-                    return (fullness + addingFullness) <= 100;
-                } else {
-                    // Without sling: W=50, M=25, S=25 (out of 50)
-                    const fullness = counts.W * 50 + counts.M * 25 + counts.S * 25;
-                    const addingFullness = size === 'W' ? 50 : size === 'M' ? 25 : 25;
-                    return (fullness + addingFullness) <= 50;
-                }
+                const fullnessValues = hasWeaponSling ? 
+                    CONSTANTS.FULLNESS_VALUES.harnessWithSling : 
+                    CONSTANTS.FULLNESS_VALUES.harness;
+                
+                const maxFullness = hasWeaponSling ? 100 : 50;
+                const fullness = counts.W * fullnessValues.W + counts.M * fullnessValues.M + counts.S * fullnessValues.S;
+                const addingFullness = fullnessValues[size] || 0;
+                return (fullness + addingFullness) <= maxFullness;
             }
             
             // For belt and primary: simple count check
@@ -9557,7 +9825,7 @@
             return 'Unknown';
         }
 
-        // Dev Tools
+        // Dev Tools with event delegation
         function handleDevToolsClick() {
             devToolsClickCount++;
             
@@ -9659,7 +9927,8 @@
                 const div = document.createElement('div');
                 div.className = 'dev-item';
                 div.textContent = `${weapon.name} (ID: ${id})`;
-                div.onclick = () => addDevItemToGround('weapon', parseInt(id));
+                div.dataset.itemType = 'weapon';
+                div.dataset.itemId = id;
                 weaponsList.appendChild(div);
             }
 
@@ -9671,7 +9940,8 @@
                 const div = document.createElement('div');
                 div.className = 'dev-item';
                 div.textContent = `${att.name} (ID: ${id})`;
-                div.onclick = () => addDevItemToGround('attachment', parseInt(id));
+                div.dataset.itemType = 'attachment';
+                div.dataset.itemId = id;
                 attachmentsList.appendChild(div);
             }
 
@@ -9683,8 +9953,24 @@
                 const div = document.createElement('div');
                 div.className = 'dev-item';
                 div.textContent = `${gear.name} (ID: ${id})`;
-                div.onclick = () => addDevItemToGround('gear', parseInt(id));
+                div.dataset.itemType = 'gear';
+                div.dataset.itemId = id;
                 gearList.appendChild(div);
+            }
+            
+            // Add event delegation
+            weaponsList.addEventListener('click', handleDevItemClick);
+            attachmentsList.addEventListener('click', handleDevItemClick);
+            gearList.addEventListener('click', handleDevItemClick);
+        }
+        
+        function handleDevItemClick(event) {
+            if (!devToolsEnabled) return;
+            const target = event.target;
+            if (target.classList.contains('dev-item')) {
+                const type = target.dataset.itemType;
+                const id = parseInt(target.dataset.itemId);
+                addDevItemToGround(type, id);
             }
         }
 
