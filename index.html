@@ -1147,30 +1147,27 @@
             align-items: center;
         }
         
-        /* Mobile: Compact attachments and improved touch targets */
+        /* Mobile: Keep original attachment grid size */
         @media (max-width: 768px) {
             body.mobile-device .attachment-grid {
-                grid-template-columns: 80px 200px 80px;
-                grid-template-rows: 70px 100px 70px;
-                gap: 10px;
+                grid-template-columns: 200px 400px 200px;
+                grid-template-rows: 120px 160px 120px;
+                gap: 15px;
             }
             
             body.mobile-device .attachment-slot {
-                width: 80px;
-                height: 70px;
-                font-size: 0.75em;
-                padding: 4px;
+                width: 200px;
+                height: 120px;
             }
             
             body.mobile-device .attachment-slot.half-width {
-                width: 80px;
-                height: 70px;
+                width: 192.5px;
+                height: 120px;
             }
             
             body.mobile-device .attachment-slot.weapon-center {
-                width: 200px;
-                height: 100px;
-                font-size: 0.85em;
+                width: 400px;
+                height: 160px;
             }
             
             body.mobile-device .weapon-name {
@@ -1540,8 +1537,9 @@
                 margin-bottom: 10px;
             }
             
-            body.mobile-device .range-display > div:last-child {
-                display: none;
+            /* Hide the range labels div that appears after the range meter */
+            body.mobile-device .range-display > div[style*="display: flex"][style*="justify-content: space-between"] {
+                display: none !important;
             }
         }
         
