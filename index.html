@@ -24,6 +24,22 @@
             -moz-user-select: none;
             -ms-user-select: none;
         }
+        
+        /* Mobile detection and defaults */
+        @media (max-width: 768px) {
+            body.mobile-device .game-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body.mobile-device .main-area {
+                order: 1;
+            }
+            
+            body.mobile-device .status-panel {
+                order: 2;
+                grid-template-columns: 1fr;
+            }
+        }
 
         /* Solid Military Theme Background */
         body.theme-military {
@@ -850,6 +866,19 @@
             flex-direction: column;
             gap: 20px;
         }
+        
+        /* Mobile layout order */
+        @media (max-width: 768px) {
+            body.mobile-device #rangePanel { order: 1; }
+            body.mobile-device .panel:has(#gearSlots) { order: 2; }
+            body.mobile-device .panel:has(#groundGear) { order: 3; }
+            body.mobile-device .panel:has(#playerLoadout) { order: 4; }
+            body.mobile-device .panel:has(#enemyLoadout) { order: 5; }
+            body.mobile-device .panel:has(#tacticalActionsPanel) { order: 6; }
+            body.mobile-device .panel:has(#combatLog) { order: 7; }
+            body.mobile-device .panel:has(#themeSelect) { order: 8; }
+            body.mobile-device .panel:has(#devGearBtn) { order: 9; }
+        }
 
         .panel {
             background: rgba(15, 52, 96, 0.4);
@@ -1005,6 +1034,14 @@
             gap: 8px;
             flex-wrap: nowrap;
         }
+        
+        /* Mobile: Allow ratings to wrap */
+        @media (max-width: 768px) {
+            body.mobile-device .ratings-display {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
 
         .ratings-display.enemy-ratings {
             display: flex;
@@ -1075,6 +1112,33 @@
             justify-content: center;
             align-items: center;
         }
+        
+        /* Mobile: Smaller attachment grid */
+        @media (max-width: 768px) {
+            body.mobile-device .attachment-grid {
+                grid-template-columns: 120px 240px 120px;
+                grid-template-rows: 80px 120px 80px;
+                gap: 10px;
+            }
+            
+            body.mobile-device .attachment-slot {
+                width: 120px;
+                height: 80px;
+                font-size: 0.8em;
+                padding: 5px;
+            }
+            
+            body.mobile-device .attachment-slot.half-width {
+                width: 115px;
+                height: 80px;
+            }
+            
+            body.mobile-device .attachment-slot.weapon-center {
+                width: 240px;
+                height: 120px;
+                font-size: 0.9em;
+            }
+        }
 
         .attachment-slot {
             width: 200px;
@@ -1120,6 +1184,12 @@
         .attachment-slot:hover {
             border-color: #e94560;
             background: rgba(233, 69, 96, 0.15);
+        }
+        
+        .attachment-slot.selected-for-assignment {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
         }
 
         .gear-slot.can-fit,
@@ -1313,6 +1383,18 @@
             transform: translateY(-2px);
         }
         
+        .gear-item.selected-for-assignment {
+            background: rgba(0, 255, 136, 0.5);
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
+        .gear-slot.selected-for-assignment {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+        
         /* Military theme hover */
         body.theme-military .gear-item:hover,
         body.theme-military .resupply-item:hover,
@@ -1347,6 +1429,28 @@
             gap: 8px;
         }
 
+        
+        /* Mobile: Default to radar display */
+        @media (max-width: 768px) {
+            body.mobile-device .range-display {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 350px;
+            }
+            
+            body.mobile-device .radar-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            body.mobile-device .radar-point {
+                width: 50px;
+                height: 50px;
+                font-size: 0.8em;
+            }
+        }
+        
         /* Range Display */
         .panel.range-panel {
             position: relative;
@@ -3109,6 +3213,12 @@
             audioEnabled: true,
             environmentEnabled: true
         };
+        
+        // Detect mobile device
+        let isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        // Selected item for tap-to-assign
+        let selectedItemForAssignment = null;
 
         // History Management
         function saveToHistory(data) {
@@ -3739,6 +3849,24 @@
         window.addEventListener('DOMContentLoaded', () => {
             DOM.init(); // Cache DOM elements
             updateStartTitleWeapons();
+            
+            // Add mobile class if on mobile device
+            if (isMobileDevice) {
+                document.body.classList.add('mobile-device');
+                // Disable animations, audio, and environment by default on mobile
+                userPreferences.animationsEnabled = false;
+                userPreferences.audioEnabled = false;
+                userPreferences.environmentEnabled = false;
+                environmentEnabled = false;
+                document.body.classList.add('animations-disabled');
+                
+                // Update button states on start screen
+                setTimeout(() => {
+                    setAnimations(false);
+                    setAudio(false);
+                    setEnvironment(false);
+                }, 100);
+            }
         });
 
         // Theme Management
@@ -7600,7 +7728,10 @@
             const isThermal = body.classList.contains('theme-thermal');
             const isMilitary = body.classList.contains('theme-military');
             
-            if (isHUD) {
+            // On mobile without theme, default to radar
+            if (isMobileDevice && !isHUD && !isNV && !isThermal && !isMilitary) {
+                updateRadarDisplay();
+            } else if (isHUD) {
                 updateRadarDisplay();
             } else if (isNV) {
                 updateNVDisplay();
@@ -8062,12 +8193,15 @@
                              data-weapon-idx="${weaponIdx}" 
                              data-slot="${slot}"
                              ondrop="dropAttachmentOnSlot(event, ${weaponIdx}, '${slot}')" 
-                             ondragover="allowDrop(event)">`;
+                             ondragover="allowDrop(event)"
+                             onclick="handleSlotTap(event, 'attachment', {weaponIdx: ${weaponIdx}, slot: '${slot}'})">`;
             
             if (attId) {
                 const att = ATTACHMENTS[attId];
                 html += `<div class="attachment-slot-badge" draggable="${draggable}" ondragstart="dragAttachmentFromSlot(event, ${weaponIdx}, '${slot}')" 
-                    data-att-id="${attId}" onmouseover="showTooltip(event, 'attachment', ${attId})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle};">`;
+                    data-att-id="${attId}" onmouseover="showTooltip(event, 'attachment', ${attId})" onmouseout="hideTooltip()" 
+                    onclick="event.stopPropagation(); handleItemTap(event, {source: 'weaponAttachment', weaponIdx: ${weaponIdx}, slot: '${slot}', attId: ${attId}})"
+                    style="cursor: ${cursorStyle};">`;
                 html += `<img src="${att.icon}" alt="${att.name}">`;
                 html += '</div>';
             } else {
@@ -8324,7 +8458,7 @@
         }
 
         function createPouchSlotHTML() {
-            let html = '<div class="pouch-slot" data-slot="pouch" ondrop="dropOnPouch(event)" ondragover="allowDrop(event)">';
+            let html = '<div class="pouch-slot" data-slot="pouch" ondrop="dropOnPouch(event)" ondragover="allowDrop(event)" onclick="handleSlotTap(event, \'pouch\', {})">';
             html += '<div style="font-size: 0.9em; color: #ffd700; font-weight: bold; margin-bottom: 10px;">💰 Pouch (Sell Items)</div>';
             html += '<div class="coin-display">';
             html += '<img src="Coin.png">';
@@ -8384,7 +8518,9 @@
             const hasWeaponSling = slotName === 'harness' && 
                 gameState.gearSlots.harness.some(item => item.type === 'gear' && item.id === 144);
             
-            let html = `<div class="gear-slot${hasWeaponSling ? ' has-weapon-sling' : ''}" data-slot="${slotName}" ondrop="dropOnGearSlot(event, '${slotName}')" ondragover="allowDrop(event)">`;
+            let html = `<div class="gear-slot${hasWeaponSling ? ' has-weapon-sling' : ''}" data-slot="${slotName}" 
+                ondrop="dropOnGearSlot(event, '${slotName}')" ondragover="allowDrop(event)"
+                onclick="handleSlotTap(event, 'gear', {slotName: '${slotName}'})">`;
             html += `<div class="gear-slot-label">${label}</div>`;
             
             if (dividers > 1) {
@@ -8433,7 +8569,9 @@
             const cursorStyle = (isGearUpPhase || devToolsEnabled) ? 'grab' : 'default';
             
             let html = `<div class="gear-item size-${itemSize}" draggable="${draggable}" ondragstart="dragGearItem(event, '${slotName}', ${idx})" 
-                onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle}; position: relative;">`;
+                onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" 
+                onclick="handleItemTap(event, {source: 'gearSlot', slotName: '${slotName}', idx: ${idx}})"
+                style="cursor: ${cursorStyle}; position: relative;">`;
             
             html += `<img src="${iconSrc}" style="object-fit: contain;">`;
             
@@ -8485,7 +8623,9 @@
                 }
                 
                 let html = `<div class="gear-item" draggable="${draggable}" ondragstart="dragGroundItem(event, ${idx})" 
-                    onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" style="cursor: ${cursorStyle};">`;
+                    onmouseover="showTooltip(event, '${item.type}', ${item.id})" onmouseout="hideTooltip()" 
+                    onclick="handleItemTap(event, {source: 'ground', idx: ${idx}})"
+                    style="cursor: ${cursorStyle};">`;
                 
                 html += `<img src="${iconSrc}" style="width: 24px; height: 24px; object-fit: contain; margin-right: 5px;">`;
                 html += `<span>${label}</span>`;
@@ -8652,6 +8792,331 @@
             const attId = weapon.attachments[slot];
             draggedItem = { source: 'weaponAttachment', weaponIdx, slot, attId };
             event.dataTransfer.effectAllowed = 'move';
+        }
+        
+        // Tap-to-assign functionality
+        function handleItemTap(event, itemData) {
+            event.stopPropagation();
+            
+            // If clicking the same item, deselect it
+            if (selectedItemForAssignment && 
+                selectedItemForAssignment.source === itemData.source &&
+                JSON.stringify(selectedItemForAssignment) === JSON.stringify(itemData)) {
+                clearSelectedItem();
+                return;
+            }
+            
+            // First tap: select item and show valid slots
+            clearSelectedItem();
+            selectedItemForAssignment = itemData;
+            
+            // Highlight the selected item
+            if (itemData.source === 'ground') {
+                const groundItems = document.querySelectorAll('#groundGearContents .gear-item');
+                if (groundItems[itemData.idx]) {
+                    groundItems[itemData.idx].classList.add('selected-for-assignment');
+                }
+            } else if (itemData.source === 'gearSlot') {
+                const slot = document.querySelector(`.gear-slot[data-slot="${itemData.slotName}"] .gear-slot-contents`);
+                if (slot) {
+                    const items = slot.querySelectorAll('.gear-item');
+                    if (items[itemData.idx]) {
+                        items[itemData.idx].classList.add('selected-for-assignment');
+                    }
+                }
+            } else if (itemData.source === 'weaponAttachment') {
+                const attachSlot = document.querySelector(`.attachment-slot[data-weapon-idx="${itemData.weaponIdx}"][data-slot="${itemData.slot}"]`);
+                if (attachSlot) {
+                    attachSlot.classList.add('selected-for-assignment');
+                }
+            }
+            
+            // Show valid slots
+            if (itemData.source === 'weaponAttachment') {
+                const att = ATTACHMENTS[itemData.attId];
+                highlightCompatibleSlots(att.size, att.group);
+            } else {
+                let item = null;
+                if (itemData.source === 'ground') {
+                    item = gameState.groundGear[itemData.idx];
+                } else if (itemData.source === 'gearSlot') {
+                    item = gameState.gearSlots[itemData.slotName][itemData.idx];
+                }
+                
+                if (item) {
+                    let size = '';
+                    if (item.type === 'weapon') {
+                        size = (item.weapon && item.weapon.size) ? item.weapon.size : 'W';
+                    } else if (item.type === 'attachment') {
+                        size = item.data.size;
+                        highlightCompatibleSlots(size, item.data.group);
+                        return;
+                    } else {
+                        size = item.data.size;
+                    }
+                    highlightCompatibleSlots(size);
+                }
+            }
+        }
+        
+        function handleSlotTap(event, slotType, slotData) {
+            event.stopPropagation();
+            
+            // If no item selected, do nothing
+            if (!selectedItemForAssignment) return;
+            
+            // Second tap: assign to slot
+            if (slotType === 'gear') {
+                assignItemToGearSlot(slotData.slotName);
+            } else if (slotType === 'attachment') {
+                assignItemToAttachmentSlot(slotData.weaponIdx, slotData.slot);
+            } else if (slotType === 'pouch') {
+                assignItemToPouch();
+            } else if (slotType === 'ground') {
+                assignItemToGround();
+            }
+        }
+        
+        function clearSelectedItem() {
+            // Remove all selection highlights
+            document.querySelectorAll('.selected-for-assignment').forEach(el => {
+                el.classList.remove('selected-for-assignment');
+            });
+            clearCompatibleSlots();
+            selectedItemForAssignment = null;
+        }
+        
+        function assignItemToGearSlot(targetSlotName) {
+            if (!selectedItemForAssignment) return;
+            
+            let item = null;
+            
+            if (selectedItemForAssignment.source === 'ground') {
+                item = gameState.groundGear[selectedItemForAssignment.idx];
+                gameState.groundGear.splice(selectedItemForAssignment.idx, 1);
+            } else if (selectedItemForAssignment.source === 'gearSlot') {
+                if (selectedItemForAssignment.slotName === targetSlotName) {
+                    clearSelectedItem();
+                    return;
+                }
+                item = gameState.gearSlots[selectedItemForAssignment.slotName][selectedItemForAssignment.idx];
+                
+                if (item.type === 'weapon' && (selectedItemForAssignment.slotName === 'primary' || selectedItemForAssignment.slotName === 'harness')) {
+                    const attachments = item.weapon.getAttachmentsList();
+                    attachments.forEach(({ id }) => {
+                        gameState.groundGear.push({ type: 'attachment', id, data: ATTACHMENTS[id] });
+                    });
+                    for (let slot in item.weapon.attachments) {
+                        item.weapon.attachments[slot] = null;
+                    }
+                }
+                
+                gameState.gearSlots[selectedItemForAssignment.slotName].splice(selectedItemForAssignment.idx, 1);
+            } else if (selectedItemForAssignment.source === 'weaponAttachment') {
+                const weapon = gameState.playerWeapons[selectedItemForAssignment.weaponIdx];
+                const attId = weapon.removeAttachment(selectedItemForAssignment.slot);
+                item = { type: 'attachment', id: attId, data: ATTACHMENTS[attId] };
+                playFullRackSound();
+            }
+            
+            if (!item) {
+                clearSelectedItem();
+                return;
+            }
+            
+            if (!canFitInSlot(item, targetSlotName)) {
+                gameState.groundGear.push(item);
+                log(`${getItemName(item)} cannot fit in ${targetSlotName} slot`, 'danger');
+                clearSelectedItem();
+                updateUI();
+                return;
+            }
+            
+            if (!hasCapacityForItem(item, targetSlotName)) {
+                gameState.groundGear.push(item);
+                log(`${targetSlotName} slot is full - cannot add ${getItemName(item)}`, 'danger');
+                clearSelectedItem();
+                updateUI();
+                return;
+            }
+            
+            if (item.type === 'gear' && (item.id === 145 || item.id === 146)) {
+                if (targetSlotName !== 'harness') {
+                    gameState.groundGear.push(item);
+                    log(`${getItemName(item)} can only be placed in Harness slot`, 'danger');
+                    clearSelectedItem();
+                    updateUI();
+                    return;
+                }
+                
+                const existingWeapon = gameState.gearSlots.harness.find(i => i.type === 'weapon');
+                if (existingWeapon) {
+                    const attachments = existingWeapon.weapon.getAttachmentsList();
+                    attachments.forEach(({ id }) => {
+                        gameState.groundGear.push({ type: 'attachment', id, data: ATTACHMENTS[id] });
+                    });
+                    gameState.groundGear.push(existingWeapon);
+                    gameState.gearSlots.harness = gameState.gearSlots.harness.filter(i => i.type !== 'weapon');
+                }
+                
+                const specialWeapon = createSpecialSecondaryWeapon(item.id);
+                gameState.gearSlots.harness.push({ type: 'weapon', id: item.id, weapon: specialWeapon });
+                log(`${specialWeapon.name} equipped in harness`, 'success');
+                clearSelectedItem();
+                updateUI();
+                return;
+            }
+            
+            if (item.type === 'weapon') {
+                if (targetSlotName === 'primary' || targetSlotName === 'harness') {
+                    const existingWeapon = gameState.gearSlots[targetSlotName].find(i => i.type === 'weapon');
+                    if (existingWeapon) {
+                        const attachments = existingWeapon.weapon.getAttachmentsList();
+                        attachments.forEach(({ id }) => {
+                            gameState.groundGear.push({ type: 'attachment', id, data: ATTACHMENTS[id] });
+                        });
+                        gameState.groundGear.push(existingWeapon);
+                        gameState.gearSlots[targetSlotName] = gameState.gearSlots[targetSlotName].filter(i => i.type !== 'weapon');
+                    }
+                }
+            }
+            
+            gameState.gearSlots[targetSlotName].push(item);
+            clearSelectedItem();
+            updateUI();
+        }
+        
+        function assignItemToAttachmentSlot(weaponIdx, slot) {
+            if (!selectedItemForAssignment) return;
+            
+            const weapon = gameState.playerWeapons[weaponIdx];
+            let attId = null;
+            
+            if (selectedItemForAssignment.source === 'ground') {
+                const item = gameState.groundGear[selectedItemForAssignment.idx];
+                if (item.type !== 'attachment') {
+                    clearSelectedItem();
+                    return;
+                }
+                attId = item.id;
+                gameState.groundGear.splice(selectedItemForAssignment.idx, 1);
+            } else if (selectedItemForAssignment.source === 'gearSlot') {
+                const item = gameState.gearSlots[selectedItemForAssignment.slotName][selectedItemForAssignment.idx];
+                if (item.type !== 'attachment') {
+                    clearSelectedItem();
+                    return;
+                }
+                attId = item.id;
+                gameState.gearSlots[selectedItemForAssignment.slotName].splice(selectedItemForAssignment.idx, 1);
+            } else if (selectedItemForAssignment.source === 'weaponAttachment') {
+                if (selectedItemForAssignment.weaponIdx === weaponIdx && selectedItemForAssignment.slot === slot) {
+                    clearSelectedItem();
+                    return;
+                }
+                const sourceWeapon = gameState.playerWeapons[selectedItemForAssignment.weaponIdx];
+                attId = sourceWeapon.removeAttachment(selectedItemForAssignment.slot);
+            }
+            
+            if (!attId) {
+                clearSelectedItem();
+                return;
+            }
+            
+            const att = ATTACHMENTS[attId];
+            const groupMap = {
+                'Sight': 'sight',
+                'Underbarrel': 'underbarrel',
+                'Stock': 'stock',
+                'Alternate Ammo': 'ammo',
+                'Muzzle': 'muzzle',
+                'Rail': 'rail'
+            };
+            const attachmentSlot = groupMap[att.group];
+            if (attachmentSlot !== slot) {
+                gameState.groundGear.push({ type: 'attachment', id: attId, data: att });
+                log(`${att.name} cannot be attached to ${slot} slot`, 'danger');
+                clearSelectedItem();
+                updateUI();
+                return;
+            }
+            
+            const oldAttId = weapon.attach(attId);
+            if (oldAttId) {
+                gameState.groundGear.push({ type: 'attachment', id: oldAttId, data: ATTACHMENTS[oldAttId] });
+            }
+            
+            playFullRackSound();
+            clearSelectedItem();
+            updateUI();
+        }
+        
+        function assignItemToPouch() {
+            if (!selectedItemForAssignment) return;
+            
+            let item = null;
+            
+            if (selectedItemForAssignment.source === 'ground') {
+                item = gameState.groundGear[selectedItemForAssignment.idx];
+                gameState.groundGear.splice(selectedItemForAssignment.idx, 1);
+            } else if (selectedItemForAssignment.source === 'gearSlot') {
+                item = gameState.gearSlots[selectedItemForAssignment.slotName][selectedItemForAssignment.idx];
+                gameState.gearSlots[selectedItemForAssignment.slotName].splice(selectedItemForAssignment.idx, 1);
+                
+                if (item.type === 'weapon' && (selectedItemForAssignment.slotName === 'primary' || selectedItemForAssignment.slotName === 'harness')) {
+                    const attachments = item.weapon.getAttachmentsList();
+                    attachments.forEach(({ id }) => {
+                        gameState.groundGear.push({ type: 'attachment', id, data: ATTACHMENTS[id] });
+                    });
+                    for (let slot in item.weapon.attachments) {
+                        item.weapon.attachments[slot] = null;
+                    }
+                }
+            } else if (selectedItemForAssignment.source === 'weaponAttachment') {
+                const weapon = gameState.playerWeapons[selectedItemForAssignment.weaponIdx];
+                const attId = weapon.removeAttachment(selectedItemForAssignment.slot);
+                item = { type: 'attachment', id: attId, data: ATTACHMENTS[attId] };
+            }
+            
+            if (item) {
+                gameState.coins += 1;
+                log(`Sold ${getItemName(item)} for 1 coin`, 'success');
+            }
+            
+            clearSelectedItem();
+            updateUI();
+        }
+        
+        function assignItemToGround() {
+            if (!selectedItemForAssignment) return;
+            
+            let item = null;
+            
+            if (selectedItemForAssignment.source === 'gearSlot') {
+                item = gameState.gearSlots[selectedItemForAssignment.slotName][selectedItemForAssignment.idx];
+                gameState.gearSlots[selectedItemForAssignment.slotName].splice(selectedItemForAssignment.idx, 1);
+                
+                if (item.type === 'weapon' && (selectedItemForAssignment.slotName === 'primary' || selectedItemForAssignment.slotName === 'harness')) {
+                    const attachments = item.weapon.getAttachmentsList();
+                    attachments.forEach(({ id }) => {
+                        gameState.groundGear.push({ type: 'attachment', id, data: ATTACHMENTS[id] });
+                    });
+                    for (let slot in item.weapon.attachments) {
+                        item.weapon.attachments[slot] = null;
+                    }
+                }
+            } else if (selectedItemForAssignment.source === 'weaponAttachment') {
+                const weapon = gameState.playerWeapons[selectedItemForAssignment.weaponIdx];
+                const attId = weapon.removeAttachment(selectedItemForAssignment.slot);
+                item = { type: 'attachment', id: attId, data: ATTACHMENTS[attId] };
+                playFullRackSound();
+            }
+            
+            if (item) {
+                gameState.groundGear.push(item);
+            }
+            
+            clearSelectedItem();
+            updateUI();
         }
 
         function dropOnGearSlot(event, slotName) {
