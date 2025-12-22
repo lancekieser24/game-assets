@@ -1150,24 +1150,26 @@
         /* Mobile: Keep original attachment grid size */
         @media (max-width: 768px) {
             body.mobile-device .attachment-grid {
-                grid-template-columns: 200px 400px 200px;
-                grid-template-rows: 120px 160px 120px;
-                gap: 15px;
+                grid-template-columns: 150px 300px 150px;
+                grid-template-rows: 90px 120px 90px;
+                gap: 10px;
             }
             
             body.mobile-device .attachment-slot {
-                width: 200px;
-                height: 120px;
+                width: 150px;
+                height: 90px;
+                font-size: 0.85em;
+                padding: 5px;
             }
             
             body.mobile-device .attachment-slot.half-width {
-                width: 192.5px;
-                height: 120px;
+                width: 145px;
+                height: 90px;
             }
             
             body.mobile-device .attachment-slot.weapon-center {
-                width: 400px;
-                height: 160px;
+                width: 300px;
+                height: 120px;
             }
             
             body.mobile-device .weapon-name {
@@ -1175,12 +1177,25 @@
             }
             
             body.mobile-device .rating-badge {
-                min-width: 85px;
-                padding: 8px 10px;
+                min-width: 70px;
+                padding: 6px 8px;
+            }
+            
+            body.mobile-device .rating-label {
+                font-size: 1.2em;
+            }
+            
+            body.mobile-device .rating-value {
+                font-size: 1.8em;
             }
             
             body.mobile-device h1 {
-                font-size: 1.8em;
+                font-size: 1.6em;
+            }
+            
+            body.mobile-device h1 img {
+                width: 45px;
+                height: 34px;
             }
             
             body.mobile-device h2 {
@@ -1193,12 +1208,37 @@
             }
             
             body.mobile-device .panel {
-                padding: 15px;
+                padding: 12px;
             }
             
             body.mobile-device .combat-log {
                 height: 200px;
+                font-size: 0.9em;
+            }
+            
+            body.mobile-device .gear-item {
                 font-size: 0.85em;
+                padding: 6px;
+            }
+            
+            body.mobile-device .ground-gear-box {
+                padding: 10px;
+            }
+            
+            body.mobile-device .log-entry {
+                font-size: 1em;
+            }
+            
+            body.mobile-device p, body.mobile-device span, body.mobile-device div {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .stat-label {
+                font-size: 0.95em;
+            }
+            
+            body.mobile-device .stat-value {
+                font-size: 1.3em;
             }
         }
 
@@ -8684,6 +8724,7 @@
 
         function updateGroundGear() {
             const container = DOM.groundGearContents;
+            const groundBox = document.getElementById('groundGear');
             container.innerHTML = '';
             
             // Check if we're in gear up phase or dev tools are enabled
@@ -8724,6 +8765,17 @@
                 html += '</div>';
                 container.innerHTML += html;
             });
+            
+            // Make the ground gear box itself clickable for tap-to-assign
+            if (groundBox && !groundBox.hasAttribute('data-tap-handler')) {
+                groundBox.setAttribute('data-tap-handler', 'true');
+                groundBox.addEventListener('click', function(e) {
+                    // Only handle if clicking the box itself, not an item inside
+                    if (e.target === groundBox || e.target === container) {
+                        handleSlotTap(e, 'ground', {});
+                    }
+                });
+            }
         }
 
         // Tooltip with debouncing
@@ -8889,6 +8941,12 @@
         function handleItemTap(event, itemData) {
             event.stopPropagation();
             
+            // Check if we're in gear up phase or dev tools are enabled
+            const isGearUpPhase = !document.getElementById('gearUpPanel').classList.contains('hidden');
+            if (!isGearUpPhase && !devToolsEnabled) {
+                return; // Don't allow tap-to-assign outside of gear up phase
+            }
+            
             // If clicking the same item, deselect it
             if (selectedItemForAssignment && 
                 selectedItemForAssignment.source === itemData.source &&
@@ -8952,6 +9010,12 @@
         
         function handleSlotTap(event, slotType, slotData) {
             event.stopPropagation();
+            
+            // Check if we're in gear up phase or dev tools are enabled
+            const isGearUpPhase = !document.getElementById('gearUpPanel').classList.contains('hidden');
+            if (!isGearUpPhase && !devToolsEnabled) {
+                return; // Don't allow tap-to-assign outside of gear up phase
+            }
             
             // If no item selected, do nothing
             if (!selectedItemForAssignment) return;
@@ -9182,7 +9246,11 @@
             
             let item = null;
             
-            if (selectedItemForAssignment.source === 'gearSlot') {
+            if (selectedItemForAssignment.source === 'ground') {
+                // Already on ground, just deselect
+                clearSelectedItem();
+                return;
+            } else if (selectedItemForAssignment.source === 'gearSlot') {
                 item = gameState.gearSlots[selectedItemForAssignment.slotName][selectedItemForAssignment.idx];
                 gameState.gearSlots[selectedItemForAssignment.slotName].splice(selectedItemForAssignment.idx, 1);
                 
