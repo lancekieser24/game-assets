@@ -2745,12 +2745,40 @@
             border: 3px solid #e94560;
             border-radius: 15px;
             padding: 30px;
-            max-width: 1000px;
+            max-width: 1400px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
             z-index: 1001;
+        }
+        
+        .resupply-with-inventory {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .resupply-main-section {
+            border-right: 2px solid rgba(233, 69, 96, 0.3);
+            padding-right: 30px;
+        }
+        
+        .resupply-inventory-section {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-left: 10px;
+        }
+        
+        .resupply-inventory-section h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 10px 0;
+            z-index: 1;
         }
 
         .modal h2 {
@@ -7193,11 +7221,6 @@
             const modal = document.getElementById('resupplyModal');
             const content = document.getElementById('resupplyContent');
             
-            // Hide inventory modal on mobile by default
-            if (isMobileDevice) {
-                document.getElementById('inventoryDisplay').classList.remove('active');
-            }
-            
             const currentEngagement = gameState.totalEngagements + gameState.engagementNum - 1;
             const isEarlyGame = currentEngagement <= 3;
             
@@ -7246,7 +7269,9 @@
                 }
             }
             
-            let html = '<p style="color: #fff; margin-bottom: 20px;">Choose up to 2 items. They will be added to Ground Gear. Choose 1 or 0 items and get the rest in coins.</p>';
+            let html = '<div class="resupply-with-inventory">';
+            html += '<div class="resupply-main-section">';
+            html += '<p style="color: #fff; margin-bottom: 20px;">Choose up to 2 items. They will be added to Ground Gear. Choose 1 or 0 items and get the rest in coins.</p>';
             html += '<div class="resupply-options">';
             
             let itemIndex = 0;
@@ -7338,8 +7363,18 @@
                 html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="flex: 1;">➡️ Confirm</button>';
                 html += '</div>';
             } else {
-                html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="width: 100%;">➡️ Confirm</button>';
+                html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="width: 100%; margin-top: 20px;">➡️ Confirm</button>';
             }
+            html += '</div>'; // Close resupply-main-section
+            
+            // Add inventory column on the right (desktop only)
+            if (!isMobileDevice) {
+                html += '<div class="resupply-inventory-section">';
+                html += buildInventoryHTML();
+                html += '</div>';
+            }
+            
+            html += '</div>'; // Close resupply-with-inventory
             
             content.innerHTML = html;
             modal.classList.add('active');
@@ -7349,11 +7384,94 @@
                 selections: [],
                 items: items
             };
+        }
+        
+        function buildInventoryHTML() {
+            let html = '<h3>📦 Current Inventory</h3>';
             
-            // Show inventory modal with attachment slot info (desktop only)
-            if (!isMobileDevice) {
-                showInventoryModal();
+            // Display weapons
+            if (gameState.playerWeapons.length > 0) {
+                html += '<div class="modal-inventory-section">';
+                html += '<h4>Weapons</h4>';
+                gameState.playerWeapons.forEach(weapon => {
+                    html += `<div class="modal-inventory-item">`;
+                    html += `<strong>${weapon.name}</strong><br>`;
+                    html += `<span style="color: #aaa;">Base Ratings: ${weapon.baseRatings.map(r => r === null ? 'x' : (r === 0 ? '-' : r)).join(', ')}</span><br>`;
+                    const attachments = weapon.getAttachmentsList();
+                    if (attachments.length > 0) {
+                        html += `<span style="color: #00d4ff; font-size: 0.85em;">Attachments:</span><br>`;
+                        attachments.forEach(a => {
+                            html += `<span style="color: #00d4ff; font-size: 0.85em; margin-left: 10px;">• ${a.data.group}: ${a.data.name}</span><br>`;
+                        });
+                    } else {
+                        html += `<span style="color: #666; font-size: 0.85em;">No attachments equipped</span><br>`;
+                    }
+                    
+                    // Show which slots are empty
+                    const emptySlots = [];
+                    if (!weapon.attachments.sight) emptySlots.push('Sight');
+                    if (!weapon.attachments.underbarrel) emptySlots.push('Underbarrel');
+                    if (!weapon.attachments.stock) emptySlots.push('Stock');
+                    if (!weapon.attachments.ammo) emptySlots.push('Ammo');
+                    if (!weapon.attachments.muzzle) emptySlots.push('Muzzle');
+                    if (!weapon.attachments.rail) emptySlots.push('Rail');
+                    
+                    if (emptySlots.length > 0) {
+                        html += `<span style="color: #666; font-size: 0.75em;">Empty: ${emptySlots.join(', ')}</span>`;
+                    }
+                    html += '</div>';
+                });
+                html += '</div>';
             }
+            
+            // Display gear slots
+            const slotLabels = {
+                pack: 'Pack',
+                vest: 'Vest',
+                harness: 'Harness',
+                belt: 'Belt',
+                primary: 'Primary'
+            };
+            
+            for (let slotName in gameState.gearSlots) {
+                const items = gameState.gearSlots[slotName];
+                if (items.length > 0 && slotName !== 'primary' && slotName !== 'harness') {
+                    html += '<div class="modal-inventory-section">';
+                    html += `<h4>${slotLabels[slotName]}</h4>`;
+                    items.forEach(item => {
+                        let itemName = '';
+                        if (item.type === 'weapon') {
+                            itemName = item.weapon.name;
+                        } else if (item.type === 'attachment') {
+                            itemName = `${item.data.name} (${item.data.group})`;
+                        } else if (item.type === 'gear') {
+                            itemName = item.data.name;
+                        }
+                        html += `<div class="modal-inventory-item">${itemName}</div>`;
+                    });
+                    html += '</div>';
+                }
+            }
+            
+            // Display ground gear with attachment slots
+            if (gameState.groundGear.length > 0) {
+                html += '<div class="modal-inventory-section">';
+                html += '<h4>Ground Gear</h4>';
+                gameState.groundGear.forEach(item => {
+                    let itemName = '';
+                    if (item.type === 'weapon') {
+                        itemName = item.weapon.name;
+                    } else if (item.type === 'attachment') {
+                        itemName = `${item.data.name} (${item.data.group})`;
+                    } else if (item.type === 'gear') {
+                        itemName = item.data.name;
+                    }
+                    html += `<div class="modal-inventory-item">${itemName}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            return html;
         }
         
         function toggleInventoryModal() {
