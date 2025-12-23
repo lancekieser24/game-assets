@@ -2759,6 +2759,21 @@
             gap: 30px;
         }
         
+        @media (max-width: 768px) {
+            .resupply-with-inventory {
+                grid-template-columns: 1fr;
+            }
+            
+            .resupply-main-section {
+                border-right: none;
+                padding-right: 0;
+            }
+            
+            .resupply-inventory-section {
+                display: none;
+            }
+        }
+        
         .resupply-main-section {
             border-right: 2px solid rgba(233, 69, 96, 0.3);
             padding-right: 30px;
@@ -3151,7 +3166,10 @@
 
                     <!-- Actions -->
                     <div class="panel">
-                        <h2>⚔️ Tactical Actions</h2>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                            <h2 style="margin: 0;">⚔️ Tactical Actions</h2>
+                            <div id="tacticalSummary" style="font-size: 0.9em; color: #00d4ff; text-align: right;"></div>
+                        </div>
                         <div id="tacticalActionsPanel" style="position: relative;">
                             <div class="actions-grid" id="mainActions">
                                 <button class="action-btn" onclick="playerAction('ENGAGE')">🔫 ENGAGE</button>
@@ -4290,17 +4308,16 @@
             // Add mobile class if on mobile device
             if (isMobileDevice) {
                 document.body.classList.add('mobile-device');
-                // Disable animations, audio, and environment by default on mobile
-                userPreferences.animationsEnabled = false;
-                userPreferences.audioEnabled = false;
+                // Keep animations and audio enabled, but disable environment effects on mobile
+                userPreferences.animationsEnabled = true;
+                userPreferences.audioEnabled = true;
                 userPreferences.environmentEnabled = false;
                 environmentEnabled = false;
-                document.body.classList.add('animations-disabled');
                 
                 // Update button states on start screen
                 setTimeout(() => {
-                    setAnimations(false);
-                    setAudio(false);
+                    setAnimations(true);
+                    setAudio(true);
                     setEnvironment(false);
                 }, 100);
             }
@@ -6968,6 +6985,9 @@
                     </button>
                 </div>
             `;
+            
+            // Update the tactical summary after resetting panel
+            updateTacticalSummary();
         }
 
         function handleEnemyReposition(resolutionMessages, suppressed = false, extraPenalty = 0) {
@@ -7367,12 +7387,10 @@
             }
             html += '</div>'; // Close resupply-main-section
             
-            // Add inventory column on the right (desktop only)
-            if (!isMobileDevice) {
-                html += '<div class="resupply-inventory-section">';
-                html += buildInventoryHTML();
-                html += '</div>';
-            }
+            // Add inventory column on the right (always render, CSS handles mobile)
+            html += '<div class="resupply-inventory-section">';
+            html += buildInventoryHTML();
+            html += '</div>';
             
             html += '</div>'; // Close resupply-with-inventory
             
@@ -7689,13 +7707,10 @@
                 name: 'Suppressor'
             });
             
-            // 2. Level II Plate (random type): 2-6 coins
-            const plateTypes = [
-                { id: 107, name: 'Level II Ceramic Plates' },
-                { id: 104, name: 'Level II Steel Plates' },
-                { id: 110, name: 'Level II PE Plates' }
-            ];
-            const randomPlate = plateTypes[rand(0, 2)];
+            // 2. Random Armor Plate (from pool of IDs 104-112, excluding 99): 2-6 coins
+            const platePool = [104, 105, 106, 107, 108, 109, 110, 111, 112];
+            const randomPlateId = platePool[rand(0, platePool.length - 1)];
+            const randomPlate = { id: randomPlateId, name: GEAR[randomPlateId].name };
             gameState.blackMarketInventory.push({
                 type: 'gear',
                 id: randomPlate.id,
@@ -8280,6 +8295,9 @@
             if (rangeInfoEl) {
                 rangeInfoEl.textContent = getRangeDisplayName(gameState.currentRange, gameState.exactRangeMeters);
             }
+            
+            // Update tactical summary
+            updateTacticalSummary();
             
             // Check if we're using a themed display
             const body = document.body;
@@ -9261,6 +9279,65 @@
                     }
                 });
             }
+        }
+
+        function updateTacticalSummary() {
+            const summaryEl = document.getElementById('tacticalSummary');
+            if (!summaryEl) {
+                console.log('tacticalSummary element not found');
+                return;
+            }
+            
+            // Check if we have the necessary game state
+            if (!gameState.playerWeapons || gameState.playerWeapons.length === 0) {
+                summaryEl.innerHTML = '';
+                return;
+            }
+            
+            if (!gameState.enemyWeapon) {
+                summaryEl.innerHTML = '';
+                return;
+            }
+            
+            // Get player's best rating at current range
+            let playerRating = -10;
+            for (let weapon of gameState.playerWeapons) {
+                const rating = weapon.getCombatRatingAtRange(gameState.currentRange);
+                if (rating > playerRating) {
+                    playerRating = rating;
+                }
+            }
+            
+            // Determine enemy rating display based on intel
+            let enemyRatingDisplay = '?';
+            if (gameState.intelResult >= 5) {
+                // Full intel - show total rating
+                const enemyRating = gameState.enemyWeapon.getCombatRatingAtRange(gameState.currentRange);
+                enemyRatingDisplay = enemyRating === null ? 'x' : (enemyRating < 0 ? 'x' : enemyRating.toString());
+            } else if (gameState.intelResult === 3 || gameState.intelResult === 4) {
+                // Partial intel - show base rating only
+                const baseRating = gameState.enemyWeapon.baseRatings[gameState.currentRange];
+                enemyRatingDisplay = baseRating === null ? 'x' : (baseRating === 0 ? '-' : baseRating.toString());
+            }
+            
+            // Format player rating
+            const playerRatingDisplay = playerRating === null ? 'x' : (playerRating < 0 ? 'x' : playerRating.toString());
+            
+            // Format cover bonus
+            const playerCoverBonus = playerRating > 0 ? gameState.playerCover : 0;
+            const enemyCoverBonus = (gameState.intelResult >= 3 && enemyRatingDisplay !== '?') ? 
+                (enemyRatingDisplay === 'x' ? 0 : gameState.enemyCover) : 
+                (gameState.intelResult === 2 ? '?' : '?');
+            
+            // Build summary HTML
+            let html = `<span style="color: #fff;">Range: R${gameState.currentRange + 1}</span> / `;
+            html += `<span style="color: #00ff88;">You: ${COVER_NAMES[gameState.playerCover].replace(' Cover', '')} (+${playerCoverBonus})</span> / `;
+            html += `<span style="color: #00ff88;">Rating (${playerRatingDisplay})</span> / `;
+            html += `<span style="color: #e94560;">Enemy: ${COVER_NAMES[gameState.enemyCover].replace(' Cover', '')} (+${enemyCoverBonus})</span> / `;
+            html += `<span style="color: #e94560;">Rating (${enemyRatingDisplay})</span>`;
+            
+            summaryEl.innerHTML = html;
+            console.log('Tactical summary updated:', html);
         }
 
         // Tooltip with debouncing
