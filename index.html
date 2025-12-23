@@ -915,6 +915,37 @@
             position: relative;
         }
         
+        /* Mobile: Fixed width panels to prevent resizing */
+        @media (max-width: 768px) {
+            body.mobile-device .panel {
+                width: 100%;
+                box-sizing: border-box;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
+            body.mobile-device #tacticalActionsPanel {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            body.mobile-device #combatRollPanel {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            body.mobile-device #combatResultPanel {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            body.mobile-device .combat-summary {
+                width: 100%;
+                box-sizing: border-box;
+                max-width: 100%;
+            }
+        }
+        
         /* Futuristic theme grid pattern on panels */
         body.theme-futuristic .panel::before {
             content: '';
@@ -1263,6 +1294,63 @@
             
             body.mobile-device p, body.mobile-device span, body.mobile-device div {
                 font-size: 1em;
+            }
+            
+            /* Mobile: Ensure all text is at least 1em */
+            body.mobile-device {
+                font-size: 16px;
+            }
+            
+            body.mobile-device * {
+                font-size: 1em;
+            }
+            
+            body.mobile-device h1 {
+                font-size: 1.6em;
+            }
+            
+            body.mobile-device h2 {
+                font-size: 1.2em;
+            }
+            
+            body.mobile-device h3 {
+                font-size: 1.1em;
+            }
+            
+            body.mobile-device .rating-label {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .rating-value {
+                font-size: 1.5em;
+            }
+            
+            body.mobile-device .weapon-name {
+                font-size: 1.1em;
+            }
+            
+            body.mobile-device .action-btn {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .log-entry {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .gear-item {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .stat-label {
+                font-size: 1em;
+            }
+            
+            body.mobile-device .stat-value {
+                font-size: 1.3em;
+            }
+            
+            body.mobile-device .engagement-header {
+                font-size: 1.4em;
             }
             
             body.mobile-device .stat-label {
@@ -2825,6 +2913,7 @@
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+                <button class="start-btn" onclick="loadSaveGame()" id="loadSaveBtn" style="background: linear-gradient(135deg, #00d4ff, #0096cc); display: none;">📁 LOAD SAVE GAME</button>
                 <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
                     <span style="color: #fff; font-size: 0.9em;">🎬 Animations</span>
                     <div class="toggle-buttons">
@@ -4056,6 +4145,9 @@
         window.addEventListener('DOMContentLoaded', () => {
             DOM.init(); // Cache DOM elements
             updateStartTitleWeapons();
+            
+            // Check if there's a saved game
+            checkForSavedGame();
             
             // Add mobile class if on mobile device
             if (isMobileDevice) {
@@ -6991,6 +7083,11 @@
             const modal = document.getElementById('resupplyModal');
             const content = document.getElementById('resupplyContent');
             
+            // Hide inventory modal on mobile by default
+            if (isMobileDevice) {
+                document.getElementById('inventoryDisplay').classList.remove('active');
+            }
+            
             const currentEngagement = gameState.totalEngagements + gameState.engagementNum - 1;
             const isEarlyGame = currentEngagement <= 3;
             
@@ -7124,7 +7221,15 @@
             
             html += '</div>';
             
-            html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="width: 100%;">➡️ Confirm</button>';
+            // Mobile: Add Current Inventory button next to Confirm button
+            if (isMobileDevice) {
+                html += '<div style="display: flex; gap: 10px; margin-top: 20px;">';
+                html += '<button class="confirm-btn" onclick="toggleInventoryModal()" style="flex: 1; background: #0f3460; border-color: #0f3460;">📦 Current Inventory</button>';
+                html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="flex: 1;">➡️ Confirm</button>';
+                html += '</div>';
+            } else {
+                html += '<button class="confirm-btn" onclick="confirmResupply()" id="confirmResupplyBtn" style="width: 100%;">➡️ Confirm</button>';
+            }
             
             content.innerHTML = html;
             modal.classList.add('active');
@@ -7135,8 +7240,19 @@
                 items: items
             };
             
-            // Show inventory modal with attachment slot info
-            showInventoryModal();
+            // Show inventory modal with attachment slot info (desktop only)
+            if (!isMobileDevice) {
+                showInventoryModal();
+            }
+        }
+        
+        function toggleInventoryModal() {
+            const display = document.getElementById('inventoryDisplay');
+            if (display.classList.contains('active')) {
+                display.classList.remove('active');
+            } else {
+                showInventoryModal();
+            }
         }
 
         function showInventoryModal() {
@@ -7403,6 +7519,10 @@
 
         function continueFromGearUp() {
             playButtonClick();
+            
+            // Auto-save the game state before continuing
+            saveGameState();
+            
             // Clear ground gear
             gameState.groundGear = [];
             
@@ -7787,6 +7907,8 @@
         
         function retireFromMission() {
             playButtonClick();
+            // Clear save game when retiring
+            clearSaveGame();
             // Reload the page to start a new mission
             location.reload();
         }
@@ -7819,6 +7941,9 @@
         function endGame(victory) {
             gameState.gameOver = true;
             gameState.victory = victory;
+            
+            // Clear save game on game over
+            clearSaveGame();
             
             let missionScore = 0;
             for (let score of gameState.combatScores) {
@@ -10688,6 +10813,224 @@
                 log(`Dev: Added ${GEAR[id].name} to ground gear`, 'info');
             }
             updateUI();
+        }
+        
+        // Save/Load Game Functions
+        function saveGameState() {
+            try {
+                // Create a simplified version of gameState for saving
+                const saveData = {
+                    engagementNum: gameState.engagementNum,
+                    difficulty: gameState.difficulty,
+                    totalEngagements: gameState.totalEngagements,
+                    coins: gameState.coins,
+                    combatScores: gameState.combatScores,
+                    gearEffects: gameState.gearEffects,
+                    lastStandActive: gameState.lastStandActive || false,
+                    // Serialize weapons
+                    playerWeapons: gameState.playerWeapons.map(w => ({
+                        weaponId: w.weaponId,
+                        attachments: w.attachments,
+                        collapsibleStockBonus: w.collapsibleStockBonus,
+                        grenadeLauncherRange: w.grenadeLauncherRange,
+                        variableZoomBonus: w.variableZoomBonus
+                    })),
+                    // Serialize gear slots
+                    gearSlots: {},
+                    // Serialize ground gear
+                    groundGear: gameState.groundGear.map(item => {
+                        if (item.type === 'weapon') {
+                            return {
+                                type: 'weapon',
+                                id: item.id,
+                                weaponId: item.weapon.weaponId,
+                                attachments: item.weapon.attachments,
+                                collapsibleStockBonus: item.weapon.collapsibleStockBonus,
+                                grenadeLauncherRange: item.weapon.grenadeLauncherRange,
+                                variableZoomBonus: item.weapon.variableZoomBonus
+                            };
+                        } else {
+                            return {
+                                type: item.type,
+                                id: item.id,
+                                currentUses: item.currentUses,
+                                currentHp: item.currentHp
+                            };
+                        }
+                    })
+                };
+                
+                // Serialize gear slots
+                for (let slotName in gameState.gearSlots) {
+                    saveData.gearSlots[slotName] = gameState.gearSlots[slotName].map(item => {
+                        if (item.type === 'weapon') {
+                            return {
+                                type: 'weapon',
+                                id: item.id,
+                                weaponId: item.weapon.weaponId,
+                                attachments: item.weapon.attachments,
+                                collapsibleStockBonus: item.weapon.collapsibleStockBonus,
+                                grenadeLauncherRange: item.weapon.grenadeLauncherRange,
+                                variableZoomBonus: item.weapon.variableZoomBonus
+                            };
+                        } else {
+                            return {
+                                type: item.type,
+                                id: item.id,
+                                currentUses: item.currentUses,
+                                currentHp: item.currentHp
+                            };
+                        }
+                    });
+                }
+                
+                localStorage.setItem('overwatchAutoSave', JSON.stringify(saveData));
+                log('Game auto-saved', 'success');
+            } catch (e) {
+                console.error('Failed to save game:', e);
+                log('Failed to auto-save game', 'danger');
+            }
+        }
+        
+        function checkForSavedGame() {
+            try {
+                const savedData = localStorage.getItem('overwatchAutoSave');
+                if (savedData) {
+                    // Show the load button
+                    const loadBtn = document.getElementById('loadSaveBtn');
+                    if (loadBtn) {
+                        loadBtn.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to check for saved game:', e);
+            }
+        }
+        
+        function loadSaveGame() {
+            try {
+                const savedData = localStorage.getItem('overwatchAutoSave');
+                if (!savedData) {
+                    alert('No saved game found!');
+                    return;
+                }
+                
+                playButtonClick();
+                
+                const saveData = JSON.parse(savedData);
+                
+                // Restore basic game state
+                gameState.engagementNum = saveData.engagementNum;
+                gameState.difficulty = saveData.difficulty;
+                gameState.totalEngagements = saveData.totalEngagements;
+                gameState.coins = saveData.coins;
+                gameState.combatScores = saveData.combatScores;
+                gameState.gearEffects = saveData.gearEffects;
+                gameState.lastStandActive = saveData.lastStandActive || false;
+                
+                // Restore gear slots
+                gameState.gearSlots = {
+                    pack: [],
+                    vest: [],
+                    harness: [],
+                    belt: [],
+                    primary: [],
+                    pouch: []
+                };
+                
+                for (let slotName in saveData.gearSlots) {
+                    gameState.gearSlots[slotName] = saveData.gearSlots[slotName].map(item => {
+                        if (item.type === 'weapon') {
+                            const weapon = new Weapon(item.weaponId);
+                            weapon.attachments = item.attachments;
+                            weapon.collapsibleStockBonus = item.collapsibleStockBonus;
+                            weapon.grenadeLauncherRange = item.grenadeLauncherRange;
+                            weapon.variableZoomBonus = item.variableZoomBonus;
+                            return {
+                                type: 'weapon',
+                                id: item.id,
+                                weapon: weapon
+                            };
+                        } else if (item.type === 'attachment') {
+                            return {
+                                type: 'attachment',
+                                id: item.id,
+                                data: ATTACHMENTS[item.id]
+                            };
+                        } else {
+                            const gearItem = {
+                                type: 'gear',
+                                id: item.id,
+                                data: GEAR[item.id]
+                            };
+                            if (item.currentUses !== undefined) gearItem.currentUses = item.currentUses;
+                            if (item.currentHp !== undefined) gearItem.currentHp = item.currentHp;
+                            return gearItem;
+                        }
+                    });
+                }
+                
+                // Restore ground gear
+                gameState.groundGear = saveData.groundGear.map(item => {
+                    if (item.type === 'weapon') {
+                        const weapon = new Weapon(item.weaponId);
+                        weapon.attachments = item.attachments;
+                        weapon.collapsibleStockBonus = item.collapsibleStockBonus;
+                        weapon.grenadeLauncherRange = item.grenadeLauncherRange;
+                        weapon.variableZoomBonus = item.variableZoomBonus;
+                        return {
+                            type: 'weapon',
+                            id: item.id,
+                            weapon: weapon
+                        };
+                    } else if (item.type === 'attachment') {
+                        return {
+                            type: 'attachment',
+                            id: item.id,
+                            data: ATTACHMENTS[item.id]
+                        };
+                    } else {
+                        const gearItem = {
+                            type: 'gear',
+                            id: item.id,
+                            data: GEAR[item.id]
+                        };
+                        if (item.currentUses !== undefined) gearItem.currentUses = item.currentUses;
+                        if (item.currentHp !== undefined) gearItem.currentHp = item.currentHp;
+                        return gearItem;
+                    }
+                });
+                
+                // Update player weapons from gear
+                updatePlayerWeaponsFromGear();
+                
+                // Populate weapon backgrounds and dev tools
+                populateWeaponBackgrounds();
+                updateTitleWeapons();
+                populateDevTools();
+                
+                // Hide start screen and show game screen
+                document.getElementById('startScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                
+                log('Game loaded successfully!', 'success');
+                log(`Resuming at Engagement ${gameState.totalEngagements + gameState.engagementNum}`, 'info');
+                
+                // Start the next engagement
+                startEngagement();
+            } catch (e) {
+                console.error('Failed to load game:', e);
+                alert('Failed to load saved game. The save file may be corrupted.');
+            }
+        }
+        
+        function clearSaveGame() {
+            try {
+                localStorage.removeItem('overwatchAutoSave');
+                log('Save game cleared', 'info');
+            } catch (e) {
+                console.error('Failed to clear save game:', e);
+            }
         }
     </script>
 </body>
