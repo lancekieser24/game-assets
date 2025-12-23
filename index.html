@@ -6230,7 +6230,7 @@
             
             let resultHTML = '<div class="combat-summary">';
             resultHTML += '<h3>⚔️ Combat Result</h3>';
-            resultHTML += '<div style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin: 20px 0;">';
+            resultHTML += '<div style="display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: center; margin: 20px 0;">';
             
             let playerWon = false;
             let scoreDifferential = 0;
@@ -6239,12 +6239,12 @@
             if (playerTotal === 0 && enemyTotal === 0) {
                 isTie = true;
                 log(`\n*** STALEMATE! Both scored 0 - Engagement restarts! ***`, 'combat');
-                resultHTML += `<div style="background: rgba(15, 52, 96, 0.6); padding: 15px; border-radius: 8px; border: 2px solid #0f3460;">
+                resultHTML += `<div style="background: rgba(15, 52, 96, 0.6); padding: 15px; border-radius: 8px; border: 2px solid #0f3460; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR SCORE</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">0</div>
                 </div>`;
                 resultHTML += `<div style="font-size: 2em; color: #e94560; font-weight: bold;">VS</div>`;
-                resultHTML += `<div style="background: rgba(15, 52, 96, 0.6); padding: 15px; border-radius: 8px; border: 2px solid #0f3460;">
+                resultHTML += `<div style="background: rgba(15, 52, 96, 0.6); padding: 15px; border-radius: 8px; border: 2px solid #0f3460; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY SCORE</div>
                     <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">0</div>
                 </div>`;
@@ -6260,12 +6260,12 @@
                     document.getElementById('combatRollPanel').classList.add('hidden');
                     document.getElementById('combatResultPanel').classList.remove('hidden');
                     
-                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88;">
+                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR SCORE</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${playerTotal}</div>
                     </div>`;
                     resultHTML += `<div style="font-size: 2em; color: #e94560; font-weight: bold;">VS</div>`;
-                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444;">
+                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY SCORE</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${enemyTotal}</div>
                     </div>`;
@@ -6289,12 +6289,12 @@
                 }
                 
                 log(`\n*** VICTORY! ${playerTotal} vs ${enemyTotal} ***`, 'success');
-                resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; width: 100%; max-width: 300px;">
+                resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR SCORE</div>
                     <div style="font-size: 2em; font-weight: bold; color: #e94560;">${playerTotal}</div>
                 </div>`;
-                resultHTML += `<div style="font-size: 1.5em; color: #e94560; font-weight: bold; margin: 10px 0;">VS</div>`;
-                resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; width: 100%; max-width: 300px;">
+                resultHTML += `<div style="font-size: 1.5em; color: #e94560; font-weight: bold; margin: 0 10px;">VS</div>`;
+                resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY SCORE</div>
                     <div style="font-size: 2em; font-weight: bold; color: #e94560;">${enemyTotal}</div>
                 </div>`;
@@ -6341,12 +6341,12 @@
                 }
                 
                 log(`\n*** DEFEAT! ${enemyTotal} vs ${playerTotal} ***`, 'danger');
-                resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; width: 100%; max-width: 300px;">
+                resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR SCORE</div>
                     <div style="font-size: 2em; font-weight: bold; color: #e94560;">${playerTotal}</div>
                 </div>`;
-                resultHTML += `<div style="font-size: 1.5em; color: #e94560; font-weight: bold; margin: 10px 0;">VS</div>`;
-                resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; width: 100%; max-width: 300px;">
+                resultHTML += `<div style="font-size: 1.5em; color: #e94560; font-weight: bold; margin: 0 10px;">VS</div>`;
+                resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; min-width: 150px; text-align: center;">
                     <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY SCORE</div>
                     <div style="font-size: 2em; font-weight: bold; color: #e94560;">${enemyTotal}</div>
                 </div>`;
@@ -6360,12 +6360,12 @@
                     playerWon = true;
                     scoreDifferential = playerTB - enemyTB;
                     log('*** VICTORY BY TIEBREAKER! ***', 'success');
-                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88;">
+                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${playerTB}</div>
                     </div>`;
                     resultHTML += `<div style="font-size: 2em; color: #e94560; font-weight: bold;">VS</div>`;
-                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444;">
+                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${enemyTB}</div>
                     </div>`;
@@ -6405,12 +6405,12 @@
                     }
                     
                     log('*** DEFEAT BY TIEBREAKER! ***', 'danger');
-                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444;">
+                    resultHTML += `<div style="background: rgba(255, 68, 68, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ff4444; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${playerTB}</div>
                     </div>`;
                     resultHTML += `<div style="font-size: 2em; color: #e94560; font-weight: bold;">VS</div>`;
-                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88;">
+                    resultHTML += `<div style="background: rgba(0, 255, 136, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #00ff88; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${enemyTB}</div>
                     </div>`;
@@ -6418,12 +6418,12 @@
                     // Perfect tie on tiebreaker - reset engagement
                     isTie = true;
                     log(`\n*** PERFECT TIE ${playerTB} vs ${enemyTB} - No damage taken! ***`, 'combat');
-                    resultHTML += `<div style="background: rgba(255, 170, 0, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ffaa00;">
+                    resultHTML += `<div style="background: rgba(255, 170, 0, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ffaa00; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">YOUR TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${playerTB}</div>
                     </div>`;
                     resultHTML += `<div style="font-size: 2em; color: #e94560; font-weight: bold;">VS</div>`;
-                    resultHTML += `<div style="background: rgba(255, 170, 0, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ffaa00;">
+                    resultHTML += `<div style="background: rgba(255, 170, 0, 0.2); padding: 15px; border-radius: 8px; border: 2px solid #ffaa00; min-width: 150px; text-align: center;">
                         <div style="font-size: 0.9em; color: #fff; margin-bottom: 5px;">ENEMY TIEBREAKER</div>
                         <div style="font-size: 2.5em; font-weight: bold; color: #e94560;">${enemyTB}</div>
                     </div>`;
