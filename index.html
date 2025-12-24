@@ -2681,6 +2681,16 @@
             body.mobile-device .combat-summary [style*="font-size: 2.5em"] {
                 font-size: 1.5em !important;
             }
+            
+            /* Mobile: Reduce death screen quote and grade text */
+            body.mobile-device #gameOverMessage [style*="font-size: 2.5em"],
+            body.mobile-device #gameOverMessage [style*="font-size: 2em"] {
+                font-size: 1.2em !important;
+            }
+            
+            body.mobile-device #gameOverMessage [style*="font-size: 1.3em"] {
+                font-size: 1em !important;
+            }
         }
         
         /* Military theme - solid combat summary */
@@ -3740,82 +3750,34 @@
             if (history.length === 0) {
                 html += '<p style="text-align: center; padding: 40px; color: #aaa;">No mission history yet. Complete missions to build your record.</p>';
             } else {
-                html += '<div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">';
+                // Filter history by difficulty
+                const normalHistory = history.filter(r => r.difficulty === 1);
+                const armoredHistory = history.filter(r => r.difficulty === 2);
                 
-                // Display in reverse order (newest first)
-                for (let i = history.length - 1; i >= 0; i--) {
-                    const record = history[i];
-                    const date = new Date(record.timestamp);
-                    const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-                    
-                    const difficultyNames = ['', 'Normal', 'Veteran', 'Spec Ops', 'Ghost'];
-                    const difficultyColors = ['', '#0f3460', '#e94560', '#ff8844', '#ffd700'];
-                    
-                    let gradeColor = '#ff4444';
-                    if (record.grade === 'S') gradeColor = '#ffd700';
-                    else if (record.grade === 'A') gradeColor = '#00ff88';
-                    else if (record.grade === 'B') gradeColor = '#00d4ff';
-                    else if (record.grade === 'C') gradeColor = '#ffaa00';
-                    else if (record.grade === 'D') gradeColor = '#ff8844';
-                    
-                    html += `<div style="background: rgba(15, 52, 96, 0.3); border: 2px solid #0f3460; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
-                    html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">`;
-                    
-                    // Left side: Date + Weapon icons
-                    html += `<div style="display: flex; align-items: center; gap: 10px;">`;
-                    html += `<div style="font-size: 0.9em; color: #aaa;">${dateStr}</div>`;
-                    
-                    // Weapon icons
-                    if (record.weaponsUsed && record.weaponsUsed.length > 0) {
-                        html += `<div style="display: flex; gap: 5px;">`;
-                        record.weaponsUsed.forEach(weapon => {
-                            html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 40px; height: 30px; object-fit: contain; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));">`;
-                        });
-                        html += `</div>`;
-                    }
-                    
-                    html += `</div>`;
-                    
-                    // Right side: Grade
-                    html += `<div style="font-size: 1.5em; font-weight: bold; color: ${gradeColor};">Grade: ${record.grade}</div>`;
-                    html += `</div>`;
-                    
-                    html += `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
-                    html += `<div><strong>Difficulty:</strong> <span style="color: ${difficultyColors[record.difficulty]};">${difficultyNames[record.difficulty]}</span></div>`;
-                    html += `<div><strong>Score:</strong> ${record.score}</div>`;
-                    html += `<div><strong>Kills:</strong> ${record.engagements}</div>`;
-                    html += `<div><strong>Result:</strong> <span style="color: ${record.victory ? '#00ff88' : '#ff4444'};">${record.victory ? 'Victory' : 'Defeat'}</span></div>`;
-                    html += `</div>`;
-                    html += `</div>`;
+                // Show tab buttons
+                html += '<div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">';
+                html += '<button class="toggle-btn" id="normalTabBtn" onclick="switchHistoryTab(\'normal\')" style="flex: 1; padding: 12px;">Normal</button>';
+                html += '<button class="toggle-btn" id="armoredTabBtn" onclick="switchHistoryTab(\'armored\')" style="flex: 1; padding: 12px;">Armored</button>';
+                html += '</div>';
+                
+                // Normal difficulty content
+                html += '<div id="normalHistoryContent" style="display: block;">';
+                if (normalHistory.length === 0) {
+                    html += '<p style="text-align: center; padding: 20px; color: #aaa;">No Normal difficulty missions completed yet.</p>';
+                } else {
+                    html += buildHistoryRecords(normalHistory);
+                    html += buildTotalsSection(normalHistory, 'Normal');
                 }
-                
                 html += '</div>';
                 
-                // Calculate totals
-                const totals = calculateTotals(history);
-                
-                html += '<div style="background: rgba(233, 69, 96, 0.2); border: 2px solid #e94560; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
-                html += '<h3 style="color: #e94560; margin-bottom: 15px; text-align: center;">📊 Career Totals</h3>';
-                
-                html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">';
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Successful Missions</div><div style="font-size: 1.8em; font-weight: bold; color: #00ff88;">${totals.successfulMissions}</div></div>`;
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Kills</div><div style="font-size: 1.8em; font-weight: bold; color: #00d4ff;">${totals.kills}</div></div>`;
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KD Ratio</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.kdRatio}</div></div>`;
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KIA</div><div style="font-size: 1.8em; font-weight: bold; color: #ff4444;">${totals.kia}</div></div>`;
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Total Score</div><div style="font-size: 1.8em; font-weight: bold; color: #fff;">${totals.totalScore}</div></div>`;
-                html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Best Score</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.bestScore}</div></div>`;
-                html += '</div>';
-                
-                // Weapons Used
-                html += '<div style="text-align: center; margin-top: 10px;">';
-                html += '<div style="font-size: 0.9em; color: #aaa; margin-bottom: 8px;">Weapons Used</div>';
-                html += '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
-                totals.uniqueWeapons.forEach(weapon => {
-                    html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 50px; height: 38px; object-fit: contain; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5)); border: 1px solid #0f3460; border-radius: 4px; background: rgba(15, 52, 96, 0.3); padding: 4px;">`;
-                });
-                html += '</div>';
-                html += '</div>';
-                
+                // Armored difficulty content
+                html += '<div id="armoredHistoryContent" style="display: none;">';
+                if (armoredHistory.length === 0) {
+                    html += '<p style="text-align: center; padding: 20px; color: #aaa;">No Armored difficulty missions completed yet.</p>';
+                } else {
+                    html += buildHistoryRecords(armoredHistory);
+                    html += buildTotalsSection(armoredHistory, 'Armored');
+                }
                 html += '</div>';
             }
             
@@ -3826,6 +3788,110 @@
             
             content.innerHTML = html;
             modal.classList.add('active');
+            
+            // Set initial tab state
+            document.getElementById('normalTabBtn')?.classList.add('active');
+        }
+        
+        function switchHistoryTab(tab) {
+            const normalContent = document.getElementById('normalHistoryContent');
+            const armoredContent = document.getElementById('armoredHistoryContent');
+            const normalBtn = document.getElementById('normalTabBtn');
+            const armoredBtn = document.getElementById('armoredTabBtn');
+            
+            if (tab === 'normal') {
+                normalContent.style.display = 'block';
+                armoredContent.style.display = 'none';
+                normalBtn.classList.add('active');
+                armoredBtn.classList.remove('active');
+            } else {
+                normalContent.style.display = 'none';
+                armoredContent.style.display = 'block';
+                normalBtn.classList.remove('active');
+                armoredBtn.classList.add('active');
+            }
+        }
+        
+        function buildHistoryRecords(records) {
+            let html = '<div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">';
+            
+            const difficultyNames = ['', 'Normal', 'Veteran', 'Spec Ops', 'Ghost'];
+            const difficultyColors = ['', '#0f3460', '#e94560', '#ff8844', '#ffd700'];
+            
+            for (let i = records.length - 1; i >= 0; i--) {
+                const record = records[i];
+                const date = new Date(record.timestamp);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                
+                let gradeColor = '#ff4444';
+                if (record.grade === 'S') gradeColor = '#ffd700';
+                else if (record.grade === 'A') gradeColor = '#00ff88';
+                else if (record.grade === 'B') gradeColor = '#00d4ff';
+                else if (record.grade === 'C') gradeColor = '#ffaa00';
+                else if (record.grade === 'D') gradeColor = '#ff8844';
+                
+                html += `<div style="background: rgba(15, 52, 96, 0.3); border: 2px solid #0f3460; border-radius: 8px; padding: 15px; margin-bottom: 15px;">`;
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">`;
+                
+                // Left side: Date + Weapon icons
+                html += `<div style="display: flex; align-items: center; gap: 10px;">`;
+                html += `<div style="font-size: 0.9em; color: #aaa;">${dateStr}</div>`;
+                
+                // Weapon icons
+                if (record.weaponsUsed && record.weaponsUsed.length > 0) {
+                    html += `<div style="display: flex; gap: 5px;">`;
+                    record.weaponsUsed.forEach(weapon => {
+                        html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 40px; height: 30px; object-fit: contain; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.5));">`;
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `</div>`;
+                
+                // Right side: Grade
+                html += `<div style="font-size: 1.5em; font-weight: bold; color: ${gradeColor};">Grade: ${record.grade}</div>`;
+                html += `</div>`;
+                
+                html += `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+                html += `<div><strong>Difficulty:</strong> <span style="color: ${difficultyColors[record.difficulty]};">${difficultyNames[record.difficulty]}</span></div>`;
+                html += `<div><strong>Score:</strong> ${record.score}</div>`;
+                html += `<div><strong>Kills:</strong> ${record.engagements}</div>`;
+                html += `<div><strong>Result:</strong> <span style="color: ${record.victory ? '#00ff88' : '#ff4444'};">${record.victory ? 'Victory' : 'Defeat'}</span></div>`;
+                html += `</div>`;
+                html += `</div>`;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+        
+        function buildTotalsSection(records, difficultyName) {
+            const totals = calculateTotals(records);
+            
+            let html = '<div style="background: rgba(233, 69, 96, 0.2); border: 2px solid #e94560; border-radius: 8px; padding: 20px; margin-bottom: 20px;">';
+            html += `<h3 style="color: #e94560; margin-bottom: 15px; text-align: center;">📊 ${difficultyName} Career Totals</h3>`;
+            
+            html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">';
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Successful Missions</div><div style="font-size: 1.8em; font-weight: bold; color: #00ff88;">${totals.successfulMissions}</div></div>`;
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Kills</div><div style="font-size: 1.8em; font-weight: bold; color: #00d4ff;">${totals.kills}</div></div>`;
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KD Ratio</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.kdRatio}</div></div>`;
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">KIA</div><div style="font-size: 1.8em; font-weight: bold; color: #ff4444;">${totals.kia}</div></div>`;
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Total Score</div><div style="font-size: 1.8em; font-weight: bold; color: #fff;">${totals.totalScore}</div></div>`;
+            html += `<div style="text-align: center;"><div style="font-size: 0.9em; color: #aaa;">Best Score</div><div style="font-size: 1.8em; font-weight: bold; color: #ffd700;">${totals.bestScore}</div></div>`;
+            html += '</div>';
+            
+            // Weapons Used
+            html += '<div style="text-align: center; margin-top: 10px;">';
+            html += '<div style="font-size: 0.9em; color: #aaa; margin-bottom: 8px;">Weapons Used</div>';
+            html += '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
+            totals.uniqueWeapons.forEach(weapon => {
+                html += `<img src="${weapon.img}" alt="${weapon.name}" title="${weapon.name}" style="width: 50px; height: 38px; object-fit: contain; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5)); border: 1px solid #0f3460; border-radius: 4px; background: rgba(15, 52, 96, 0.3); padding: 4px;">`;
+            });
+            html += '</div>';
+            html += '</div>';
+            
+            html += '</div>';
+            return html;
         }
         
         function calculateTotals(history) {
@@ -4992,6 +5058,15 @@
             startEngagement();
         }
         
+        // Add random tactical grenade to belt at game start
+        function addRandomTacticalGrenade() {
+            const tacticalPool = [113, 114, 115, 116, 119, 120, 128, 129, 130, 131];
+            const randomGearId = tacticalPool[rand(0, tacticalPool.length - 1)];
+            
+            gameState.gearSlots.belt.push({ type: 'gear', id: randomGearId, data: GEAR[randomGearId] });
+            log(`Starting tactical gear: ${GEAR[randomGearId].name} equipped in belt`, 'success');
+        }
+        
         function continueToNextSet() {
             document.getElementById('continueScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
@@ -5105,6 +5180,11 @@
             
             // Reset combat occurred flag for new engagement
             gameState.combatHasOccurred = false;
+            
+            // Add random tactical grenade to belt at start of first engagement only
+            if (currentEngagement === 1) {
+                addRandomTacticalGrenade();
+            }
             
             // Update environment effects
             updateEnvironmentEffects();
@@ -8282,7 +8362,7 @@
                             Mission Score: ${missionScore.toFixed(1)}
                         </div>
                         <div style="font-size: 1.2em; color: #aaa;">
-                            KIA during engagement ${gameState.engagementNum} of 4
+                            KIA during engagement ${gameState.totalEngagements + gameState.engagementNum} of 12
                         </div>
                     `;
                 }
